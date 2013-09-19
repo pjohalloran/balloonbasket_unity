@@ -4,6 +4,7 @@ using System.Collections;
 public class BalloonBasketMain : MonoBehaviour {
 	public Transform staticRoot;
 	public GameObject bg;
+	public SpriteRenderer ship;
 
 	public Transform dynamicRoot;
 
@@ -102,9 +103,25 @@ public class BalloonBasketMain : MonoBehaviour {
 
 		if(Input.GetKeyDown(KeyCode.Q)) {
 			rotationAngle += 0.10f;
-		} else if(Input.GetKeyDown(KeyCode.W)) {
+		} else if(Input.GetKeyDown(KeyCode.E)) {
 			rotationAngle -= 0.10f;
 		}
 		this.bg.transform.RotateAround(Vector3.zero, new Vector3(0f,0f,1f), rotationAngle*Time.deltaTime);
+
+		Vector3 shipOffset = Vector2.zero;
+		if(Input.GetKeyDown(KeyCode.A)) {
+			shipOffset.x -= 100f;
+		}
+		if(Input.GetKeyDown(KeyCode.D)) {
+			shipOffset.x += 100f;
+		}
+		if(Input.GetKeyDown(KeyCode.W)) {
+			shipOffset.y += 100f;
+		}
+		if(Input.GetKeyDown(KeyCode.S)) {
+			shipOffset.y -= 100f;
+		}
+
+		this.ship.GetComponent<Rigidbody2D>().AddForce(shipOffset * Time.deltaTime);
 	}
 }
