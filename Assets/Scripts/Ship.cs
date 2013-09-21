@@ -6,6 +6,8 @@ namespace BalloonBasket {
         public SpriteRenderer ship;
         public BalloonBasketMain main;
 
+        public Vector2 force = new Vector2(500f, 500f);
+
         void Start() {
         
         }
@@ -13,16 +15,16 @@ namespace BalloonBasket {
         void Update() {
             Vector3 shipOffset = Vector2.zero;
             if(Input.GetKeyDown(KeyCode.A)) {
-                shipOffset.x -= 100f;
+                shipOffset.x -= force.x;
             }
             if(Input.GetKeyDown(KeyCode.D)) {
-                shipOffset.x += 100f;
+                shipOffset.x += force.x;
             }
             if(Input.GetKeyDown(KeyCode.W)) {
-                shipOffset.y += 100f;
+                shipOffset.y += force.y;
             }
             if(Input.GetKeyDown(KeyCode.S)) {
-                shipOffset.y -= 100f;
+                shipOffset.y -= force.y;
             }
             
             this.ship.GetComponent<Rigidbody2D>().AddForce(shipOffset * Time.deltaTime);
