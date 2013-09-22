@@ -5,11 +5,9 @@ namespace BalloonBasket {
     public class Ship : MonoBehaviour {
         public SpriteRenderer ship;
         public BalloonBasketMain main;
-
         public Vector2 force = new Vector2(500f, 500f);
 
         void Start() {
-        
         }
 
         void Update() {
@@ -27,7 +25,7 @@ namespace BalloonBasket {
                 shipOffset.y -= force.y;
             }
             
-            this.ship.GetComponent<Rigidbody2D>().AddForce(shipOffset * Time.deltaTime);
+            this.rigidbody2D.AddForce(shipOffset * Time.deltaTime);
         }
     }
 }

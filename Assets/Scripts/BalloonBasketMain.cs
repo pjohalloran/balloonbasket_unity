@@ -13,6 +13,7 @@ namespace BalloonBasket {
     	
     	void Start () {
             Utils.InitTexture(this.bg, staticRoot, "BackgroundFinal", "Unlit/Transparent");
+            this.bg.transform.localScale = new Vector3(1.35f, 1f, 1f);
     	}
     	
     	void Update () {

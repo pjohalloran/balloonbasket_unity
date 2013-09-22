@@ -24,9 +24,9 @@ TextureImporter:
   maxTextureSize: 1024
   textureSettings:
     filterMode: -1
-    aniso: -1
+    aniso: 1
     mipBias: -1
-    wrapMode: -1
+    wrapMode: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -49,5 +49,5 @@ TextureImporter:
         height: 46
       alignment: 0
       pivot: {x: .5, y: .5}
-  spriteAtlasHint: 
+  spriteAtlasHint: bb
   userData: 
