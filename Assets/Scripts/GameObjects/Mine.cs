@@ -10,16 +10,18 @@ namespace BalloonBasket {
         private bool _up = true;
 
         void Start() {
-            InvokeRepeating("SwitchGravity", 0.0f, 0.5f);
+            //InvokeRepeating("SwitchGravity", 0.0f, 0.5f);
         }
 
         void OnCollision2DEnter(Collision2D collision) {
-            if (collision.rigidbody != null && collision.rigidbody.gameObject.GetComponent<Ship>() != null) {
+            if (collision.rigidbody != null) {
                 Explode();
 
                 Vector3 diff = this.transform.localPosition - collision.rigidbody.transform.localPosition;
                 diff.Normalize();
-                collision.rigidbody.AddForce(-diff * 150.0f);
+                if(collision.rigidbody.gameObject.GetComponent<Ship>() != null) {
+                    collision.rigidbody.AddForce(-diff * 50.0f);
+                }
             }
         }
 
@@ -29,7 +31,7 @@ namespace BalloonBasket {
             this._up = !this._up;
         }
 
-        private void Explode() {
+        public void Explode() {
             this._explodeAnim.onFinish += this.ExplodeDone;
             this._explodeAnim.Play();
         }
