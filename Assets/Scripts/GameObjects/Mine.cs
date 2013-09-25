@@ -3,9 +3,13 @@ using System.Collections;
 
 namespace BalloonBasket {
     public class Mine : MonoBehaviour {
+        public delegate void OnExplodeShip();
+
         public float force = 10.0f;
         public SpriteAnimation _explodeAnim;
         public SpriteRenderer _sprite;
+
+        public OnExplodeShip onExplodeShip;
 
         private bool _up = true;
 
@@ -20,6 +24,9 @@ namespace BalloonBasket {
                 Vector3 diff = this.transform.localPosition - collision.rigidbody.transform.localPosition;
                 diff.Normalize();
                 if(collision.rigidbody.gameObject.GetComponent<Ship>() != null) {
+                    if(this.onExplodeShip != null) {
+                        this.onExplodeShip();
+                    }
                     collision.rigidbody.AddForce(-diff * 50.0f);
                 }
             }

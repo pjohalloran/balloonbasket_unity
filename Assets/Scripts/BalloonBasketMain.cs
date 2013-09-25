@@ -13,8 +13,12 @@ namespace BalloonBasket {
     	
         public Rect screenRect;
 
+        public AnimationCurve curve;
+
         private int _maxMines = 3;
         private int _currMines = 0;
+
+        float _lastExplosionTime;
 
     	void Start () {
             Utils.InitTexture(this.bg, staticRoot, "BackgroundFinal", "Unlit/Transparent");
@@ -24,31 +28,22 @@ namespace BalloonBasket {
             shipObj.transform.parent = this.dynamicRoot;
             Utils.SetTransform(shipObj.transform, new Vector3(0.0f, -1.0f, 0.0f), new Vector3(0.2f, 0.2f, 1.0f));
 
+            this._lastExplosionTime = 0.0f;
+
             InvokeRepeating("MakeMine", 0.0f, 0.25f);
     	}
     	
+        private void UpdateBgScroll() {
+            Vector2 curr = this.bg.renderer.material.GetTextureOffset("_MainTex");
+            this.bg.renderer.material.SetTextureOffset("_MainTex", curr + new Vector2(Mathf.Clamp01(Time.deltaTime*speed.x), Mathf.Clamp01(Time.deltaTime*speed.y)));
+        }
+
     	void Update () {
-    		Vector2 curr = this.bg.renderer.material.GetTextureOffset("_MainTex");
-    		this.bg.renderer.material.SetTextureOffset("_MainTex", curr + new Vector2(Mathf.Clamp01(Time.deltaTime*speed.x), Mathf.Clamp01(Time.deltaTime*speed.y)));
+            UpdateBgScroll();
 
-    		if(Input.GetKeyDown(KeyCode.UpArrow)) {
-    			speed.y += 0.05f;
-    		} else if(Input.GetKeyDown(KeyCode.DownArrow)) {
-    			speed.y -= 0.05f;
-    		} else if(Input.GetKeyDown(KeyCode.LeftArrow)) {
-    			speed.x -= 0.05f;
-    		} else if(Input.GetKeyDown(KeyCode.RightArrow)) {
-    			speed.x += 0.05f;
-    		}
+            float timeDiff = Time.time - this._lastExplosionTime;
+            this.speed.x = this.curve.Evaluate(timeDiff);
     		speed.x = Mathf.Clamp01(speed.x);
-    		speed.y = Mathf.Clamp01(speed.y);
-
-    		if(Input.GetKeyDown(KeyCode.Q)) {
-    			rotationAngle += 0.10f;
-    		} else if(Input.GetKeyDown(KeyCode.E)) {
-    			rotationAngle -= 0.10f;
-    		}
-    		this.bg.transform.RotateAround(Vector3.zero, new Vector3(0f,0f,1f), rotationAngle*Time.deltaTime);
 
             foreach(Transform t in this.dynamicRoot.transform) {
                 Mine mine = t.gameObject.GetComponent<Mine>();
@@ -63,7 +58,7 @@ namespace BalloonBasket {
 
         private void MakeMine() {
             if(this._currMines < this._maxMines) {
-                InstantiateMine(new Vector3(Random.Range(0.0f, 1.0f), Random.Range(-1.0f, 1.0f), 0.0f));
+                InstantiateMine(new Vector3(Random.Range(1.0f, 1.1f), Random.Range(-1.0f, 1.0f), 0.0f));
             }
         }
 
@@ -73,7 +68,12 @@ namespace BalloonBasket {
             Utils.SetTransform(mineObj.transform, position, new Vector3(0.2f, 0.2f, 1.0f));
             mineObj.rigidbody2D.AddForce(new Vector2(-speed.x*100.0f, 0.0f));
             mineObj.GetComponent<Mine>()._explodeAnim.onFinish += this.OnMineDestroy;
+            mineObj.GetComponent<Mine>().onExplodeShip += this.OnMineCollideShip;
             ++this._currMines;
+        }
+
+        private void OnMineCollideShip() {
+            this._lastExplosionTime = Time.time;
         }
 
         private void OnMineDestroy() {
