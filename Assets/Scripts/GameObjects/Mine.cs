@@ -5,16 +5,15 @@ namespace BalloonBasket {
     public class Mine : MonoBehaviour {
         public delegate void OnExplodeShip();
 
-        public float force = 10.0f;
-        public SpriteAnimation _explodeAnim;
-        public SpriteRenderer _sprite;
+        [SerializeField] private float _force = 10.0f;
+        [SerializeField] public SpriteAnimation _explodeAnim;
+        [SerializeField] private SpriteRenderer _sprite;
 
         public OnExplodeShip onExplodeShip;
 
         private bool _up = true;
 
         void Start() {
-            //InvokeRepeating("SwitchGravity", 0.0f, 0.5f);
         }
 
         void OnCollision2DEnter(Collision2D collision) {
@@ -33,7 +32,7 @@ namespace BalloonBasket {
         }
 
         private void SwitchGravity() {
-            Vector3 vec = new Vector3(0.0f, (this._up ? force : -force), 0.0f);
+            Vector3 vec = new Vector3(0.0f, (this._up ? _force : -_force), 0.0f);
             this.rigidbody2D.AddForce(vec);
             this._up = !this._up;
         }

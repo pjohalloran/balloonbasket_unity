@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5631513bf79e34d6d890a6e3f9585bbc
+guid: 1bc6f98f8962648b5bfc9af23e186e35
 TextureImporter:
   serializedVersion: 2
   mipmaps:
@@ -40,13 +40,13 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: BalloonGrayPNG
+    - name: GullDie8
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 77
-        height: 79
+        width: 306
+        height: 287
       alignment: 0
       pivot: {x: .5, y: .5}
   spriteAtlasHint: 

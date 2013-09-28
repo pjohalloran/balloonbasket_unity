@@ -11,9 +11,9 @@ namespace BalloonBasket {
         public delegate void OnPause();
         public delegate void OnStop();
 
-        public string animPrefix;
-        public int frameCount;
-        public float duration;
+        [SerializeField] private string _animPrefix;
+        [SerializeField] private int _frameCount;
+        [SerializeField] private float _duration;
 
         public OnStart onStart;
         public OnFinish onFinish;
@@ -29,11 +29,11 @@ namespace BalloonBasket {
         private bool _pause;
         private SpriteRenderer _sprite;
 
-        void Start () {
-            this._frameTime = duration / frameCount;
-            this._frames = new List<Texture2D>(this.frameCount);
-            for(int i = 0; i < this.frameCount; ++i) {
-                this._frames.Add(Utils.LoadResource(string.Format("{0}{1}", this.animPrefix, i+1)) as Texture2D);
+        void Awake() {
+            this._frameTime = _duration / _frameCount;
+            this._frames = new List<Texture2D>(this._frameCount);
+            for(int i = 0; i < this._frameCount; ++i) {
+                this._frames.Add(Utils.LoadResource(string.Format("{0}{1}", this._animPrefix, i+1)) as Texture2D);
             }
             this._sprite = this.gameObject.GetComponent<SpriteRenderer>();
 
@@ -45,7 +45,7 @@ namespace BalloonBasket {
                 this._currTime += Time.deltaTime;
                 if(this._currTime > this._currIndex*this._frameTime) {
                     this._currIndex++;
-                    if(this._currIndex < this.frameCount) {
+                    if(this._currIndex < this._frameCount) {
                         if(this.onFrameUpdate != null) {
                             this.onFrameUpdate(this._currIndex);
                         }
