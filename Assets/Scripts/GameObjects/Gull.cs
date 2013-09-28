@@ -25,7 +25,7 @@ namespace BalloonBasket {
             this._sprite.color = Color.clear;
             this.rigidbody2D.Sleep();
             this._dieAnim.Stop();
-            Destroy(this);
+            Destroy(this.gameObject);
         }
         
         void OnCollision2DEnter(Collision2D collision) {

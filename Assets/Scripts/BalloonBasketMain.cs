@@ -4,6 +4,12 @@ using System.Collections;
 namespace BalloonBasket {
     public class BalloonBasketMain : MonoBehaviour {
         [SerializeField] private Transform _staticRoot;
+        [SerializeField] private Transform _nearLayer;
+        [SerializeField] private float _nearSpeed = 0.5f;
+        [SerializeField] private Transform _midLayer;
+        [SerializeField] private float _midSpeed = 0.25f;
+        [SerializeField] private Transform _farLayer;
+        [SerializeField] private float _farSpeed = 0.1f;
         [SerializeField] private GameObject _bg;
         [SerializeField] public Transform dynamicRoot;
         [SerializeField] private Vector2 _speed = new Vector2(0.1f, 0.0f);
@@ -27,10 +33,9 @@ namespace BalloonBasket {
 
             this._lastExplosionTime = 0.0f;
 
-            //InvokeRepeating("MakeMine", 0.0f, 0.5f);
-            //InvokeRepeating("MakeGull", 0.0f, 0.5f);
-
             Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time % 10.0f));
+
+            Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time % 10.0f));
     	}
     	
         private void UpdateBgScroll() {
@@ -46,26 +51,35 @@ namespace BalloonBasket {
     		_speed.x = Mathf.Clamp01(_speed.x);
 
             foreach(Transform t in this.dynamicRoot.transform) {
-                Mine mine = t.gameObject.GetComponent<Mine>();
-                if(mine != null) {
-                    //if(!this.screenRect.Contains(mine.transform.localPosition)){
-                    if(mine.transform.localPosition.x < -1.5f || mine.transform.localPosition.y > 1.5f/* || mine.transform.localPosition.y < 1.5f || mine.transform.localPosition.x > 1.5f*/){
-                        Destroy(mine.gameObject);
-                        --this._currObstacles;
-                    }
-                } else {
-                    Gull gull = t.gameObject.GetComponent<Gull>();
-                    if(gull != null) {
-                        //if(!this.screenRect.Contains(mine.transform.localPosition)){
-                        if(gull.transform.localPosition.x < -1.5f || gull.transform.localPosition.y > 1.5f/* || mine.transform.localPosition.y < 1.5f || mine.transform.localPosition.x > 1.5f*/){
-                            Destroy(gull.gameObject);
-                            --this._currObstacles;
-                        }
-                    }
+                if(t.localPosition.x < -1.5f || t.localPosition.y > 1.5f) {
+                    Destroy(t.gameObject);
+                    --this._currObstacles;
                 }
             }
-    	}
 
+            foreach(Transform t in this._nearLayer) {
+                if(t.localPosition.x < -1.5f || t.localPosition.y > 1.5f) {
+                    Destroy(t.gameObject);
+                } else {
+                    t.localPosition -= new Vector3(this._nearSpeed*this._speed.x*Time.deltaTime, t.localPosition.y, t.localPosition.z);
+                }
+            }
+            foreach(Transform t in this._midLayer) {
+                if(t.localPosition.x < -3f || t.localPosition.y > 3f) {
+                    Destroy(t.gameObject);
+                } else {
+                    t.localPosition -= new Vector3(this._midSpeed*this._speed.x*Time.deltaTime, t.localPosition.y, t.localPosition.z);
+                }
+            }
+            foreach(Transform t in this._farLayer) {
+                if(t.localPosition.x < -6f || t.localPosition.y > 6f) {
+                    Destroy(t.gameObject);
+                } else {
+                    t.localPosition -= new Vector3(this._farSpeed*this._speed.x*Time.deltaTime, t.localPosition.y, t.localPosition.z);
+                }
+            }
+        }
+        
         private void MakeMine() {
             if(this._spawnItems && this._currObstacles < this._maxObstacles) {
                 GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.1f), Random.Range(-1.0f, 1.0f), 0.0f), "Mine");
@@ -82,9 +96,9 @@ namespace BalloonBasket {
         }
 
         private void MakeRandomObstacle() {
-            int res = Random.Range(1, 10);
+            int res = Random.Range(1, 2);
 
-            if(res < 5) {
+            if(res == 1) {
                 MakeMine();
             } else {
                 MakeGull();
@@ -95,6 +109,48 @@ namespace BalloonBasket {
             Invoke("MakeRandomObstacle", nextTime);
         }
 
+        private void MakeRandomBg() {
+            int layerRes = Random.Range(0, 3);
+            Transform t = null;
+
+            if(layerRes == 1) {
+                t = this._nearLayer;
+            } else if(layerRes == 2){
+                t = this._midLayer;
+            } else {
+                t = this._farLayer;
+            }
+
+            int typeRes = Random.Range(0, 3);
+            Texture2D tex = null;
+
+            if(typeRes == 1) {
+                tex = Utils.LoadResource("Cloud"+Random.Range(1, 5)) as Texture2D;
+            } else if(typeRes == 2) {
+                tex = Utils.LoadResource("Ground"+Random.Range(1, 6)) as Texture2D;
+            } else {
+                tex = Utils.LoadResource("Tree"+Random.Range(1, 2)) as Texture2D;
+            }
+
+            GameObject obj = InstantiateBg(new Vector3(Random.Range(1.0f, 1.5f), Random.Range(-1.0f, 1.0f), 0.0f), "Scenery", t);
+            obj.GetComponent<SpriteRenderer>().sprite = Sprite.Create(tex,
+                                                                      new Rect(0f, 0f, tex.width, tex.height),
+                                                                      new Vector2(0.5f, 0.5f));
+            obj.GetComponent<SpriteRenderer>().sortingOrder = layerRes;
+
+            float nextTime = this._spawnCurve.Evaluate(Time.time % 10.0f);
+            Debug.Log ("Spawning again in "+nextTime);
+            Invoke("MakeRandomBg", nextTime);
+        }
+
+        private GameObject InstantiateBg(Vector3 position, string prefabName, Transform parent) {
+            GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource(prefabName));
+            Vector3 origScale = obj.transform.localScale;
+            obj.transform.parent = parent;
+            Utils.SetTransform(obj.transform, position, origScale);
+            return obj;
+        }
+        
         private GameObject InstantiateObstacle(Vector3 position, string prefabName) {
             GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource(prefabName));
             Vector3 origScale = obj.transform.localScale;
