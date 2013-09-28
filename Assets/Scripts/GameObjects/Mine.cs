@@ -1,5 +1,8 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+
+using UnityEngine;
+
 
 namespace BalloonBasket {
     public class Mine : MonoBehaviour {
@@ -8,6 +11,7 @@ namespace BalloonBasket {
         [SerializeField] private float _force = 10.0f;
         [SerializeField] public SpriteAnimation _explodeAnim;
         [SerializeField] private SpriteRenderer _sprite;
+        [SerializeField] private List<AudioClip> _explodeFx;
 
         public OnExplodeShip onExplodeShip;
 
@@ -38,6 +42,7 @@ namespace BalloonBasket {
         }
 
         public void Explode() {
+            this.audio.PlayOneShot(this._explodeFx[Random.Range(0, this._explodeFx.Count-1)]);
             this._explodeAnim.onFinish += this.ExplodeDone;
             this._explodeAnim.Play();
         }

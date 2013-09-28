@@ -7,13 +7,12 @@ namespace BalloonBasket {
         [SerializeField] private GameObject _bg;
         [SerializeField] public Transform dynamicRoot;
         [SerializeField] private Vector2 _speed = new Vector2(0.1f, 0.0f);
-        [SerializeField] private float _rotationAngle = 0.0f;
         [SerializeField] private AnimationCurve _scrollCurve;
 
         [SerializeField] private bool _spawnItems = true;
 
-        private int _maxMines = 3;
-        private int _currMines = 0;
+        private int _maxObstacles = 6;
+        private int _currObstacles = 0;
         private float _lastExplosionTime;
 
     	void Start () {
@@ -28,6 +27,7 @@ namespace BalloonBasket {
             this._lastExplosionTime = 0.0f;
 
             InvokeRepeating("MakeMine", 0.0f, 0.25f);
+            InvokeRepeating("MakeGull", 0.0f, 0.15f);
     	}
     	
         private void UpdateBgScroll() {
@@ -47,27 +47,45 @@ namespace BalloonBasket {
                 if(mine != null) {
                     //if(!this.screenRect.Contains(mine.transform.localPosition)){
                     if(mine.transform.localPosition.x < -1.5f || mine.transform.localPosition.y > 1.5f/* || mine.transform.localPosition.y < 1.5f || mine.transform.localPosition.x > 1.5f*/){
-                       mine.Explode();
+                        Destroy(mine.gameObject);
+                        --this._currObstacles;
+                    }
+                } else {
+                    Gull gull = t.gameObject.GetComponent<Gull>();
+                    if(gull != null) {
+                        //if(!this.screenRect.Contains(mine.transform.localPosition)){
+                        if(gull.transform.localPosition.x < -1.5f || gull.transform.localPosition.y > 1.5f/* || mine.transform.localPosition.y < 1.5f || mine.transform.localPosition.x > 1.5f*/){
+                            Destroy(gull.gameObject);
+                            --this._currObstacles;
+                        }
                     }
                 }
             }
     	}
 
         private void MakeMine() {
-            if(this._spawnItems && this._currMines < this._maxMines) {
-                InstantiateMine(new Vector3(Random.Range(1.0f, 1.1f), Random.Range(-1.0f, 1.0f), 0.0f));
+            if(this._spawnItems && this._currObstacles < this._maxObstacles) {
+                GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.1f), Random.Range(-1.0f, 1.0f), 0.0f), "Mine");
+                obj.GetComponent<Mine>()._explodeAnim.onFinish += this.OnMineDestroy;
+                obj.GetComponent<Mine>().onExplodeShip += this.OnMineCollideShip;
             }
         }
 
-        private void InstantiateMine(Vector3 position) {
-            GameObject mineObj = (GameObject)GameObject.Instantiate(Utils.LoadResource("Mine"));
-            Vector3 origScale = mineObj.transform.localScale;
-            mineObj.transform.parent = this.dynamicRoot;
-            Utils.SetTransform(mineObj.transform, position, origScale);
-            mineObj.rigidbody2D.AddForce(new Vector2(-_speed.x*100.0f, 0.0f));
-            mineObj.GetComponent<Mine>()._explodeAnim.onFinish += this.OnMineDestroy;
-            mineObj.GetComponent<Mine>().onExplodeShip += this.OnMineCollideShip;
-            ++this._currMines;
+        private void MakeGull() {
+            if(this._spawnItems && this._currObstacles < this._maxObstacles) {
+                GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.5f), Random.Range(-1.0f, 1.0f), 0.0f), "Gull");
+                obj.GetComponent<Gull>().onDeath = this.OnGullDestroy;
+            }
+        }
+
+        private GameObject InstantiateObstacle(Vector3 position, string prefabName) {
+            GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource(prefabName));
+            Vector3 origScale = obj.transform.localScale;
+            obj.transform.parent = this.dynamicRoot;
+            Utils.SetTransform(obj.transform, position, origScale);
+            obj.rigidbody2D.AddForce(new Vector2(-_speed.x*100.0f, 0.0f));
+            ++this._currObstacles;
+            return obj;
         }
 
         private void OnMineCollideShip() {
@@ -75,7 +93,11 @@ namespace BalloonBasket {
         }
 
         private void OnMineDestroy() {
-            --this._currMines;
+            --this._currObstacles;
+        }
+
+        private void OnGullDestroy(Gull gull) {
+            --this._currObstacles;
         }
     }
 }
