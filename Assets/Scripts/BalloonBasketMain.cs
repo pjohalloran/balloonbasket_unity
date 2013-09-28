@@ -8,6 +8,7 @@ namespace BalloonBasket {
         [SerializeField] public Transform dynamicRoot;
         [SerializeField] private Vector2 _speed = new Vector2(0.1f, 0.0f);
         [SerializeField] private AnimationCurve _scrollCurve;
+        [SerializeField] private AnimationCurve _spawnCurve;
 
         [SerializeField] private bool _spawnItems = true;
 
@@ -26,8 +27,10 @@ namespace BalloonBasket {
 
             this._lastExplosionTime = 0.0f;
 
-            InvokeRepeating("MakeMine", 0.0f, 0.25f);
-            InvokeRepeating("MakeGull", 0.0f, 0.15f);
+            //InvokeRepeating("MakeMine", 0.0f, 0.5f);
+            //InvokeRepeating("MakeGull", 0.0f, 0.5f);
+
+            Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time % 10.0f));
     	}
     	
         private void UpdateBgScroll() {
@@ -76,6 +79,20 @@ namespace BalloonBasket {
                 GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.5f), Random.Range(-1.0f, 1.0f), 0.0f), "Gull");
                 obj.GetComponent<Gull>().onDeath = this.OnGullDestroy;
             }
+        }
+
+        private void MakeRandomObstacle() {
+            int res = Random.Range(1, 10);
+
+            if(res < 5) {
+                MakeMine();
+            } else {
+                MakeGull();
+            }
+
+            float nextTime = this._spawnCurve.Evaluate(Time.time % 10.0f);
+            Debug.Log ("Spawning again in "+nextTime);
+            Invoke("MakeRandomObstacle", nextTime);
         }
 
         private GameObject InstantiateObstacle(Vector3 position, string prefabName) {
