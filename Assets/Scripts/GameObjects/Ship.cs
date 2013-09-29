@@ -14,9 +14,6 @@ namespace BalloonBasket {
 
         void Start() {
             this.transform.localPosition = Vector3.zero;
-
-            float x = this.transform.localPosition.x;
-            float y = this.transform.localPosition.y;
             this._balloons = new List<Balloon>(this._balloonCount);
             for(int i = 0; i < this._balloonCount; ++i) {
                 this._balloons.Add(InstantiateBalloon(this.transform.localPosition + new Vector3(0.0f, 0.2f, 0.0f)));
