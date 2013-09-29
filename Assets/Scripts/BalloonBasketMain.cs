@@ -51,7 +51,7 @@ namespace BalloonBasket {
     		_speed.x = Mathf.Clamp01(_speed.x);
 
             foreach(Transform t in this.dynamicRoot.transform) {
-                if(t.localPosition.x < -1.5f || t.localPosition.y > 1.5f) {
+                if(t.localPosition.x < -1.5f || t.localPosition.x > 2.0f || t.localPosition.y > 1.5f) {
                     Destroy(t.gameObject);
                     --this._currObstacles;
                 }
