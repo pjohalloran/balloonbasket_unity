@@ -105,7 +105,7 @@ namespace BalloonBasket {
             }
 
             float nextTime = this._spawnCurve.Evaluate(Time.time % 10.0f);
-            Debug.Log ("Spawning again in "+nextTime);
+            //Debug.Log ("Spawning again in "+nextTime);
             Invoke("MakeRandomObstacle", nextTime);
         }
 
@@ -132,7 +132,6 @@ namespace BalloonBasket {
             if(typeRes == 1) {
                 tex = Utils.LoadResource("Cloud"+Random.Range(1, 5)) as Texture2D;
                 position.y = Random.Range(0.0f, 1.5f);
-                Debug.Log ("y = " + position.y);
             } else if(typeRes == 2) {
                 tex = Utils.LoadResource("Ground"+Random.Range(1, 6)) as Texture2D;
                 position.y = 0.0f;
@@ -148,7 +147,7 @@ namespace BalloonBasket {
             obj.GetComponent<SpriteRenderer>().sortingOrder = layerRes;
 
             float nextTime = this._spawnCurve.Evaluate(Time.time % 10.0f);
-            Debug.Log ("Spawning again in "+nextTime);
+            //Debug.Log ("Spawning again in "+nextTime);
             Invoke("MakeRandomBg", nextTime);
         }
 

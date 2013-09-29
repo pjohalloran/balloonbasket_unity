@@ -14,6 +14,7 @@ namespace BalloonBasket {
         [SerializeField] private string _animPrefix;
         [SerializeField] private int _frameCount;
         [SerializeField] private float _duration;
+        [SerializeField] private bool _loop = false;
 
         public OnStart onStart;
         public OnFinish onFinish;
@@ -58,6 +59,10 @@ namespace BalloonBasket {
                         this._play = false;
                         if(this.onFinish != null) {
                             this.onFinish();
+                        }
+                        if(this._loop) {
+                            Reset();
+                            Play();
                         }
                     }
                 }
