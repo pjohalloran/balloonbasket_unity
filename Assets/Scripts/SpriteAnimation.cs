@@ -30,6 +30,26 @@ namespace BalloonBasket {
         private bool _pause;
         private SpriteRenderer _sprite;
 
+        public string AnimPrefix {
+            get {
+                return this._animPrefix;
+            }
+            set {
+                this._animPrefix = value;
+                Reset();
+            }
+        }
+
+        public int FrameCount {
+            get {
+                return this._frameCount;
+            }
+            set {
+                this._frameCount = value;
+                Reset();
+            }
+        }
+
         void Awake() {
             this._frameTime = _duration / _frameCount;
             this._frames = new List<Texture2D>(this._frameCount);

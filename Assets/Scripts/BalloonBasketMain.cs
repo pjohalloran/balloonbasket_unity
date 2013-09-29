@@ -126,7 +126,7 @@ namespace BalloonBasket {
                 position.x = Random.Range(4.5f, 6.0f);
             }
 
-            int typeRes = Random.Range(0, 3);
+            int typeRes = Random.Range(0, 4);
             Texture2D tex = null;
 
             if(typeRes == 1) {
@@ -135,16 +135,21 @@ namespace BalloonBasket {
             } else if(typeRes == 2) {
                 tex = Utils.LoadResource("Ground"+Random.Range(1, 6)) as Texture2D;
                 position.y = 0.0f;
-            } else {
+            } else if(typeRes == 3) {
                 tex = Utils.LoadResource("Tree"+Random.Range(1, 2)) as Texture2D;
                 position.y = 0.0f;
+            } else {
+                position.y = Random.Range(0.0f, 1.5f);
+                InstantiateBg(position, "Gust", this._nearLayer);
             }
 
-            GameObject obj = InstantiateBg(position, "Scenery", t);
-            obj.GetComponent<SpriteRenderer>().sprite = Sprite.Create(tex,
-                                                                      new Rect(0f, 0f, tex.width, tex.height),
-                                                                      new Vector2(0.5f, 0.5f));
-            obj.GetComponent<SpriteRenderer>().sortingOrder = layerRes;
+            if(typeRes != 0) {
+                GameObject obj = InstantiateBg(position, "Scenery", t);
+                obj.GetComponent<SpriteRenderer>().sprite = Sprite.Create(tex,
+                                                                          new Rect(0f, 0f, tex.width, tex.height),
+                                                                          new Vector2(0.5f, 0.5f));
+                obj.GetComponent<SpriteRenderer>().sortingOrder = layerRes;
+            }
 
             float nextTime = this._spawnCurve.Evaluate(Time.time % 10.0f);
             //Debug.Log ("Spawning again in "+nextTime);
