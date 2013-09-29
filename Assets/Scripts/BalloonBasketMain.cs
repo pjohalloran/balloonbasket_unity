@@ -96,7 +96,7 @@ namespace BalloonBasket {
         }
 
         private void MakeRandomObstacle() {
-            int res = Random.Range(1, 2);
+            int res = Random.Range(0, 2);
 
             if(res == 1) {
                 MakeMine();
