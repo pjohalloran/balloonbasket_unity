@@ -13,6 +13,7 @@ namespace BalloonBasket {
         [SerializeField] private DistanceJoint2D _joint;
         [SerializeField] private AudioClip _inflateCip;
         [SerializeField] private AudioClip _popClip;
+        [SerializeField] private LineRenderer _line;
 
         public OnPopped onPopped;
 
@@ -31,6 +32,11 @@ namespace BalloonBasket {
 
         void Start() {
             Inflate();
+        }
+
+        void Update() {
+            this._line.SetPosition(0, this.transform.localPosition);
+            this._line.SetPosition(1, this.Ship.transform.localPosition);
         }
 
         private void Inflate() {
