@@ -58,24 +58,24 @@ namespace BalloonBasket {
             }
 
             foreach(Transform t in this._nearLayer) {
-                if(t.localPosition.x < -1.5f || t.localPosition.y > 1.5f) {
+                if(t.localPosition.x < -1.5f) {
                     Destroy(t.gameObject);
                 } else {
-                    t.localPosition -= new Vector3(this._nearSpeed*this._speed.x*Time.deltaTime, t.localPosition.y, t.localPosition.z);
+                    t.localPosition -= new Vector3(this._nearSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
                 }
             }
             foreach(Transform t in this._midLayer) {
-                if(t.localPosition.x < -3f || t.localPosition.y > 3f) {
+                if(t.localPosition.x < -6f) {
                     Destroy(t.gameObject);
                 } else {
-                    t.localPosition -= new Vector3(this._midSpeed*this._speed.x*Time.deltaTime, t.localPosition.y, t.localPosition.z);
+                    t.localPosition -= new Vector3(this._midSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
                 }
             }
             foreach(Transform t in this._farLayer) {
-                if(t.localPosition.x < -6f || t.localPosition.y > 6f) {
+                if(t.localPosition.x < -12f) {
                     Destroy(t.gameObject);
                 } else {
-                    t.localPosition -= new Vector3(this._farSpeed*this._speed.x*Time.deltaTime, t.localPosition.y, t.localPosition.z);
+                    t.localPosition -= new Vector3(this._farSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
                 }
             }
         }
@@ -113,12 +113,17 @@ namespace BalloonBasket {
             int layerRes = Random.Range(0, 3);
             Transform t = null;
 
+            Vector3 position = Vector3.zero;
+
             if(layerRes == 1) {
                 t = this._nearLayer;
+                position.x = Random.Range(1.0f, 1.5f);
             } else if(layerRes == 2){
                 t = this._midLayer;
+                position.x = Random.Range(3.0f, 4.5f);
             } else {
                 t = this._farLayer;
+                position.x = Random.Range(4.5f, 6.0f);
             }
 
             int typeRes = Random.Range(0, 3);
@@ -126,13 +131,17 @@ namespace BalloonBasket {
 
             if(typeRes == 1) {
                 tex = Utils.LoadResource("Cloud"+Random.Range(1, 5)) as Texture2D;
+                position.y = Random.Range(0.0f, 1.5f);
+                Debug.Log ("y = " + position.y);
             } else if(typeRes == 2) {
                 tex = Utils.LoadResource("Ground"+Random.Range(1, 6)) as Texture2D;
+                position.y = 0.0f;
             } else {
                 tex = Utils.LoadResource("Tree"+Random.Range(1, 2)) as Texture2D;
+                position.y = 0.0f;
             }
 
-            GameObject obj = InstantiateBg(new Vector3(Random.Range(1.0f, 1.5f), Random.Range(-1.0f, 1.0f), 0.0f), "Scenery", t);
+            GameObject obj = InstantiateBg(position, "Scenery", t);
             obj.GetComponent<SpriteRenderer>().sprite = Sprite.Create(tex,
                                                                       new Rect(0f, 0f, tex.width, tex.height),
                                                                       new Vector2(0.5f, 0.5f));
