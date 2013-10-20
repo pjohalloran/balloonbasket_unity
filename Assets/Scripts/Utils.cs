@@ -80,6 +80,14 @@ namespace BalloonBasket {
             }
             go.renderer.material.shader = shader;
         }
+
+        public static string LoadLevel(string levelName) {
+            TextAsset level = LoadResource(levelName) as TextAsset;
+            if(level == null) {
+                return null;
+            }
+            return level.text;
+        }
 	}
 }
 
