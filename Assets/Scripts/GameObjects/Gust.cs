@@ -28,7 +28,28 @@ namespace BalloonBasket {
         }
 
         void OnTrigger2DEnter(Collider2D other) {
+            GustEvents.TriggerGustEnter();
             other.rigidbody2D.AddForce(this._force);
+        }
+    }
+
+    public class GustEvents {
+        public delegate void OnGustEnter();
+
+        private static OnGustEnter _onGustEnter;
+
+        public static event OnGustEnter OnGustEnterDelegate {
+            add {
+                GustEvents._onGustEnter += value;
+            } remove {
+                GustEvents._onGustEnter -= value;
+            }
+        }
+
+        public static void TriggerGustEnter() {
+            if(GustEvents._onGustEnter != null) {
+                GustEvents._onGustEnter();
+            }
         }
     }
 }

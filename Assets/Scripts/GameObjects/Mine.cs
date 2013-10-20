@@ -23,6 +23,7 @@ namespace BalloonBasket {
         void OnCollision2DEnter(Collision2D collision) {
             if (collision.rigidbody != null) {
                 Explode();
+                this.rigidbody2D.Sleep();
 
                 Vector3 diff = this.transform.localPosition - collision.rigidbody.transform.localPosition;
                 diff.Normalize();

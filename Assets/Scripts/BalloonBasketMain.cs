@@ -15,12 +15,14 @@ namespace BalloonBasket {
         [SerializeField] private Vector2 _speed = new Vector2(0.1f, 0.0f);
         [SerializeField] private AnimationCurve _scrollCurve;
         [SerializeField] private AnimationCurve _spawnCurve;
+        [SerializeField] private AnimationCurve _gustCurve;
 
         [SerializeField] private bool _spawnItems = true;
 
         private int _maxObstacles = 6;
         private int _currObstacles = 0;
         private float _lastExplosionTime;
+        private float _lastGustTime;
 
     	void Start () {
             Utils.InitTexture(this._bg, _staticRoot, "BackgroundFinal", "Unlit/Transparent");
@@ -32,12 +34,23 @@ namespace BalloonBasket {
             shipObj.GetComponent<Ship>().main = this;
 
             this._lastExplosionTime = 0.0f;
+            this._lastGustTime = 0.0f;
 
             Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time % 10.0f));
-
             Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time % 10.0f));
+
+            GustEvents.OnGustEnterDelegate += this.OnGust;
     	}
+
+        void OnDestroy() {
+            GustEvents.OnGustEnterDelegate -= this.OnGust;
+        }
     	
+        private void OnGust() {
+            Debug.Log("HIT GUST");
+            this._lastGustTime = Time.time;
+        }
+
         private void UpdateBgScroll() {
             Vector2 curr = this._bg.renderer.material.GetTextureOffset("_MainTex");
             this._bg.renderer.material.SetTextureOffset("_MainTex", curr + new Vector2(Mathf.Clamp01(Time.deltaTime*_speed.x), Mathf.Clamp01(Time.deltaTime*_speed.y)));
@@ -46,9 +59,16 @@ namespace BalloonBasket {
     	void Update () {
             UpdateBgScroll();
 
-            float timeDiff = Time.time - this._lastExplosionTime;
-            this._speed.x = this._scrollCurve.Evaluate(timeDiff);
-    		_speed.x = Mathf.Clamp01(_speed.x);
+            float scrollTimeDiff = Time.time - this._lastExplosionTime;
+            float speedScroll = this._scrollCurve.Evaluate(scrollTimeDiff);
+
+            float gustTimeDiff = Time.time - this._lastGustTime;
+            float speedGust = 0.0f;
+            if(gustTimeDiff > 0.0f) {
+                speedGust = this._gustCurve.Evaluate(gustTimeDiff);
+            }
+
+            this._speed.x = Mathf.Clamp01(Mathf.Max(speedScroll, speedGust));
 
             foreach(Transform t in this.dynamicRoot.transform) {
                 if(t.localPosition.x < -1.5f || t.localPosition.x > 2.0f || t.localPosition.y > 1.5f) {
