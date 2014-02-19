@@ -20,7 +20,7 @@ namespace BalloonBasket {
         void Start() {
         }
 
-        void OnCollision2DEnter(Collision2D collision) {
+		void OnCollisionEnter2D(Collision2D collision) {
             if (collision.rigidbody != null) {
                 Explode();
                 this.rigidbody2D.Sleep();

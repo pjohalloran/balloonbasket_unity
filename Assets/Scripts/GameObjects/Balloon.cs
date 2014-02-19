@@ -9,8 +9,9 @@ namespace BalloonBasket {
         [SerializeField] private SpriteAnimation _inflateAnim;
         [SerializeField] private SpriteRenderer _sprite;
         [SerializeField] private Texture2D _defaultImage;
-        [SerializeField] private Color _color;
+        [SerializeField] private Color[] _color;
         [SerializeField] private DistanceJoint2D _joint;
+		//[SerializeField] private SpringJoint2D _springJoint;
         [SerializeField] private AudioClip _inflateCip;
         [SerializeField] private AudioClip _popClip;
         [SerializeField] private LineRenderer _line;
@@ -26,17 +27,19 @@ namespace BalloonBasket {
                 this._ship = value;
                 if(this._ship != null) {
                     this._joint.connectedBody = this.Ship.rigidbody2D;
+					//this._springJoint.connectedBody = this.Ship.rigidbody2D;
                 }
             }
         }
 
         void Start() {
             Inflate();
+			this._sprite.color = this._color[Random.Range(0, this._color.Length-1)];
         }
 
         void Update() {
-            this._line.SetPosition(0, this.transform.localPosition);
-            this._line.SetPosition(1, this.Ship.transform.localPosition);
+            this._line.SetPosition(0, this.transform.position);
+            this._line.SetPosition(1, this.Ship.transform.position);
         }
 
         private void Inflate() {
@@ -55,6 +58,7 @@ namespace BalloonBasket {
         public void Pop() {
             this.audio.PlayOneShot(this._popClip);
             this._joint.connectedBody = null;
+			//this._springJoint.connectedBody = null;
             this._popAnim.onFinish = this.OnPopDone;
             this._popAnim.Play();
         }
@@ -70,9 +74,10 @@ namespace BalloonBasket {
 
         public void SetJointDistance(float distance) {
             this._joint.distance = distance;
+			//this._springJoint.distance = distance;
         }
         
-        void OnCollision2DEnter(Collision2D collision) {
+		void OnCollisionEnter2D(Collision2D collision) {
             if(collision.rigidbody != null && 
                (collision.rigidbody.gameObject.GetComponent<Mine>() != null ||
                collision.rigidbody.gameObject.GetComponent<Gull>() != null)) {

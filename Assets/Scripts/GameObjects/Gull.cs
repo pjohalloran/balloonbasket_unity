@@ -28,7 +28,7 @@ namespace BalloonBasket {
             Destroy(this.gameObject);
         }
         
-        void OnCollision2DEnter(Collision2D collision) {
+		void OnCollisionEnter2D(Collision2D collision) {
             if(collision.rigidbody != null && 
                (collision.rigidbody.gameObject.GetComponent<Ship>() != null ||
                 collision.rigidbody.gameObject.GetComponent<Mine>() != null)) {
