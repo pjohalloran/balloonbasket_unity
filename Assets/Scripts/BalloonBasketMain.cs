@@ -26,17 +26,17 @@ namespace BalloonBasket {
 
     	void Start () {
             Utils.InitTexture(this._bg, _staticRoot, "BackgroundFinal", "Unlit/Transparent");
-            this._bg.transform.localScale = new Vector3(1.35f, 1f, 1f);
+            this._bg.transform.localScale = new Vector3(512f, 384f, 1f);
 
             GameObject shipObj = (GameObject)GameObject.Instantiate(Utils.LoadResource("Ship"));
             shipObj.transform.parent = this.dynamicRoot;
-            Utils.SetTransform(shipObj.transform, new Vector3(0.0f, -1.0f, 0.0f), new Vector3(0.2f, 0.2f, 1.0f));
+            Utils.SetTransform(shipObj.transform, Vector3.zero);
             shipObj.GetComponent<Ship>().main = this;
 
             this._lastExplosionTime = 0.0f;
             this._lastGustTime = 0.0f;
 
-            Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time % 10.0f));
+            //Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time % 10.0f));
             Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time % 10.0f));
 
             GustEvents.OnGustEnterDelegate += this.OnGust;
@@ -63,36 +63,36 @@ namespace BalloonBasket {
             float speedScroll = this._scrollCurve.Evaluate(scrollTimeDiff);
 
             float gustTimeDiff = Time.time - this._lastGustTime;
-            float speedGust = 0.0f;
-            if(gustTimeDiff > 0.0f) {
+            float speedGust = 0f;
+            if(gustTimeDiff > 0f) {
                 speedGust = this._gustCurve.Evaluate(gustTimeDiff);
             }
 
             this._speed.x = Mathf.Clamp01(Mathf.Max(speedScroll, speedGust));
 
-            foreach(Transform t in this.dynamicRoot.transform) {
-                if(t.localPosition.x < -1.5f || t.localPosition.x > 2.0f || t.localPosition.y > 1.5f) {
-                    Destroy(t.gameObject);
-                    --this._currObstacles;
-                }
-            }
+//            foreach(Transform t in this.dynamicRoot.transform) {
+//                if(t.localPosition.x < -1.5f || t.localPosition.x > 2.0f || t.localPosition.y > 1.5f) {
+//                    Destroy(t.gameObject);
+//                    --this._currObstacles;
+//                }
+//            }
 
             foreach(Transform t in this._nearLayer) {
-                if(t.localPosition.x < -1.5f) {
+                if(t.localPosition.x < -600f) {
                     Destroy(t.gameObject);
                 } else {
                     t.localPosition -= new Vector3(this._nearSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
                 }
             }
             foreach(Transform t in this._midLayer) {
-                if(t.localPosition.x < -6f) {
+                if(t.localPosition.x < -600f) {
                     Destroy(t.gameObject);
                 } else {
                     t.localPosition -= new Vector3(this._midSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
                 }
             }
             foreach(Transform t in this._farLayer) {
-                if(t.localPosition.x < -12f) {
+                if(t.localPosition.x < -600f) {
                     Destroy(t.gameObject);
                 } else {
                     t.localPosition -= new Vector3(this._farSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
@@ -137,13 +137,13 @@ namespace BalloonBasket {
 
             if(layerRes == 1) {
                 t = this._nearLayer;
-                position.x = Random.Range(1.0f, 1.5f);
+                position.x = Random.Range(-550f, 600f);
             } else if(layerRes == 2){
                 t = this._midLayer;
-                position.x = Random.Range(3.0f, 4.5f);
+				position.x = Random.Range(-550f, 600f);
             } else {
                 t = this._farLayer;
-                position.x = Random.Range(4.5f, 6.0f);
+				position.x = Random.Range(-550f, 600f);
             }
 
             int typeRes = Random.Range(0, 4);
@@ -151,15 +151,15 @@ namespace BalloonBasket {
 
             if(typeRes == 1) {
                 tex = Utils.LoadResource("Cloud"+Random.Range(1, 5)) as Texture2D;
-                position.y = Random.Range(0.0f, 1.5f);
+				position.y = Random.Range(-100f, 384f);
             } else if(typeRes == 2) {
                 tex = Utils.LoadResource("Ground"+Random.Range(1, 6)) as Texture2D;
-                position.y = 0.0f;
+                position.y = -512f;
             } else if(typeRes == 3) {
                 tex = Utils.LoadResource("Tree"+Random.Range(1, 2)) as Texture2D;
-                position.y = 0.0f;
+                position.y = -512f;
             } else {
-                position.y = Random.Range(0.0f, 1.5f);
+				position.y = Random.Range(-384f, 384f);
                 InstantiateBg(position, "Gust", this._nearLayer);
             }
 
@@ -167,7 +167,7 @@ namespace BalloonBasket {
                 GameObject obj = InstantiateBg(position, "Scenery", t);
                 obj.GetComponent<SpriteRenderer>().sprite = Sprite.Create(tex,
                                                                           new Rect(0f, 0f, tex.width, tex.height),
-                                                                          new Vector2(0.5f, 0.5f));
+                                                                          new Vector2(0.5f, 0.5f), 1f);
                 obj.GetComponent<SpriteRenderer>().sortingOrder = layerRes;
             }
 

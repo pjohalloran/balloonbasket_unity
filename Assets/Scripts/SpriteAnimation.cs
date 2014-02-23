@@ -73,7 +73,7 @@ namespace BalloonBasket {
                         Texture2D t = this._frames[this._currIndex];
                         this._sprite.sprite = Sprite.Create(this._frames[this._currIndex],
                                                             new Rect(0f, 0f, t.width, t.height),
-                                                            new Vector2(0.5f, 0.5f));
+                                                            new Vector2(0.5f, 0.5f), 1f);
                     } else {
                         // done
                         this._play = false;

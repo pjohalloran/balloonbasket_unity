@@ -15,6 +15,7 @@ namespace BalloonBasket {
         [SerializeField] private AudioClip _inflateCip;
         [SerializeField] private AudioClip _popClip;
         [SerializeField] private LineRenderer _line;
+		[SerializeField] private GameObject _lineEndpoint;
 
         public OnPopped onPopped;
 
@@ -38,8 +39,8 @@ namespace BalloonBasket {
         }
 
         void Update() {
-            this._line.SetPosition(0, this.transform.position);
-            this._line.SetPosition(1, this.Ship.transform.position);
+			this._line.SetPosition(0, this._lineEndpoint.transform.position);
+            this._line.SetPosition(1, this.Ship.GetLineEndpoint().position);
         }
 
         private void Inflate() {
@@ -52,7 +53,7 @@ namespace BalloonBasket {
             this._inflateAnim.Stop();
             this._sprite.sprite = Sprite.Create(this._defaultImage,
                                          new Rect(0f, 0f, this._defaultImage.width, this._defaultImage.height),
-                                         new Vector2(0.5f, 0.5f));
+                                         new Vector2(0.5f, 0.5f), 1f);
         }
 
         public void Pop() {
