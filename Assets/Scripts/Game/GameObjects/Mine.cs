@@ -5,7 +5,7 @@ using UnityEngine;
 
 using BalloonBasket.Tech;
 
-namespace BalloonBasket {
+namespace BalloonBasket.Game {
     public class Mine : MonoBehaviour {
 		public static readonly string PREFAB_NAME = "Mine";
 

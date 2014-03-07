@@ -4,7 +4,7 @@ using UnityEngine;
 
 using BalloonBasket.Tech;
 
-namespace BalloonBasket {
+namespace BalloonBasket.Game {
     public class BalloonBasketMain : MonoBehaviour {
         [SerializeField] private Transform _staticRoot;
         [SerializeField] private Transform _nearLayer;

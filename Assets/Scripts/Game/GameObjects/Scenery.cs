@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace BalloonBasket {
+namespace BalloonBasket.Game {
     public class Scenery : MonoBehaviour {
         [SerializeField] private SpriteRenderer _sprite;
 

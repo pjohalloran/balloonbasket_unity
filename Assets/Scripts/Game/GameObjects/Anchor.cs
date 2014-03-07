@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-namespace BalloonBasket {
-    public class Flag : MonoBehaviour {
+namespace BalloonBasket.Game {
+    public class Anchor : MonoBehaviour {
         void Start() {
         }
         
