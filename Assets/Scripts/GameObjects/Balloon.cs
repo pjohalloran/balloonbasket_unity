@@ -3,6 +3,8 @@ using System.Collections;
 
 namespace BalloonBasket {
     public class Balloon : MonoBehaviour {
+		public static readonly string PREFAB_NAME = "Balloon";
+
         public delegate void OnPopped(Balloon balloon);
 
         [SerializeField] private SpriteAnimation _popAnim;

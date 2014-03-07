@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace BalloonBasket {
     public class Mine : MonoBehaviour {
+		public static readonly string PREFAB_NAME = "Mine";
+
         public delegate void OnExplodeShip();
 
         [SerializeField] private float _force = 10.0f;

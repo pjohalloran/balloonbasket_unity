@@ -3,6 +3,8 @@ using System.Collections;
 
 namespace BalloonBasket {
     public class Gull : MonoBehaviour {
+		public static readonly string PREFAB_NAME = "Gull";
+
         public delegate void OnDeath(Gull gull);
         
         [SerializeField] private SpriteAnimation _dieAnim;

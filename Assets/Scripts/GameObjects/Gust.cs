@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace BalloonBasket {
     public class Gust : MonoBehaviour {
+		public static readonly string PREFAB_NAME = "Gust";
+
         [SerializeField] private SpriteRenderer _sprite;
         [SerializeField] private SpriteAnimation _gustAnim;
         [SerializeField] private Vector2 _force = new Vector2(10.0f, 0.0f);
