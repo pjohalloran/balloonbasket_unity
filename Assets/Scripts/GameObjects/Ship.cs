@@ -3,9 +3,14 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+using BalloonBasket.Tech;
+
 namespace BalloonBasket {
     public class Ship : MonoBehaviour {
 		public static readonly string PREFAB_NAME = "Ship";
+
+		private static readonly string ANCHOR_NAME = "ShipAnchor";
+		private static readonly string RANDOM_FORCE_METHODNAME = "RandomForce";
 
         [SerializeField] private SpriteRenderer _ship;
         [SerializeField] public BalloonBasketMain main;
@@ -26,14 +31,14 @@ namespace BalloonBasket {
 				this._balloons.Add(InstantiateBalloon(this._lineEndpoint.transform.localPosition + new Vector3(0.0f, 150f, 0.0f)));
             }
 
-			this._sliderJoint.connectedBody = GameObject.Find("ShipAnchor").GetComponent<Rigidbody2D>();
+			this._sliderJoint.connectedBody = GameObject.Find(Ship.ANCHOR_NAME).GetComponent<Rigidbody2D>();
 			this.BobbingRange = new Vector2(500f, 750f);
 
-			Invoke("RandomForce", Random.Range(1f, 10f));
+			Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(1f, 10f));
         }
 
         private Balloon InstantiateBalloon(Vector3 position) {
-            GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource("Balloon") as GameObject);
+            GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource(Balloon.PREFAB_NAME) as GameObject);
             Vector3 origScale = obj.transform.localScale;
             obj.transform.parent = main.dynamicRoot;
             Utils.SetTransform(obj.transform, position, origScale);
@@ -49,7 +54,7 @@ namespace BalloonBasket {
 			Vector2 force = GenerateRandomForce(Random.Range(1f,10f) > 5f);
 			this.rigidbody2D.AddForce(force);
 			Debug.Log (string.Format("Force {0} at {1}", force.ToString(), Time.time));
-			Invoke("RandomForce", Random.Range(1f, 10f));
+			Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(1f, 10f));
 		}
 
         private void OnBalloonPopped(Balloon balloon) {
@@ -110,13 +115,13 @@ namespace BalloonBasket {
 			this._sliderJoint.limits = limits;
 
 			if(this.transform.localPosition.y < limits.min) {
-				CancelInvoke("RandomForce");
-				Invoke("RandomForce", Random.Range(2f, 10f));
+				CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
+				Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
 				Vector2 randomForce = GenerateRandomForce(true);
 				this.rigidbody2D.AddForce(randomForce);
 			} else if(this.transform.localPosition.y > limits.max) {
-				CancelInvoke("RandomForce");
-				Invoke("RandomForce", Random.Range(2f, 10f));
+				CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
+				Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
 				Vector2 randomForce = GenerateRandomForce(false);
 				this.rigidbody2D.AddForce(randomForce);
 			}

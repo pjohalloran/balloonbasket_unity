@@ -1,5 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+
+using UnityEngine;
+
+using BalloonBasket.Tech;
 
 namespace BalloonBasket {
     public class BalloonBasketMain : MonoBehaviour {
@@ -28,7 +31,7 @@ namespace BalloonBasket {
             Utils.InitTexture(this._bg, _staticRoot, "BackgroundFinal", "Unlit/Transparent");
             this._bg.transform.localScale = new Vector3(512f, 384f, 1f);
 
-            GameObject shipObj = (GameObject)GameObject.Instantiate(Utils.LoadResource("Ship"));
+            GameObject shipObj = (GameObject)GameObject.Instantiate(Utils.LoadResource(Ship.PREFAB_NAME));
             shipObj.transform.parent = this.dynamicRoot;
             Utils.SetTransform(shipObj.transform, Vector3.zero);
             shipObj.GetComponent<Ship>().main = this;
@@ -102,7 +105,7 @@ namespace BalloonBasket {
         
         private void MakeMine() {
             if(this._spawnItems && this._currObstacles < this._maxObstacles) {
-                GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.1f), Random.Range(-1.0f, 1.0f), 0.0f), "Mine");
+                GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.1f), Random.Range(-1.0f, 1.0f), 0.0f), Mine.PREFAB_NAME);
                 obj.GetComponent<Mine>()._explodeAnim.onFinish += this.OnMineDestroy;
                 obj.GetComponent<Mine>().onExplodeShip += this.OnMineCollideShip;
             }
@@ -110,7 +113,7 @@ namespace BalloonBasket {
 
         private void MakeGull() {
             if(this._spawnItems && this._currObstacles < this._maxObstacles) {
-                GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.5f), Random.Range(-1.0f, 1.0f), 0.0f), "Gull");
+                GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.5f), Random.Range(-1.0f, 1.0f), 0.0f), Gull.PREFAB_NAME);
                 obj.GetComponent<Gull>().onDeath = this.OnGullDestroy;
             }
         }

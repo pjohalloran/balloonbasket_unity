@@ -1,5 +1,8 @@
-using UnityEngine;
 using System.Collections;
+
+using UnityEngine;
+
+using BalloonBasket.Tech;
 
 namespace BalloonBasket {
     public class Balloon : MonoBehaviour {
@@ -13,7 +16,6 @@ namespace BalloonBasket {
         [SerializeField] private Texture2D _defaultImage;
         [SerializeField] private Color[] _color;
         [SerializeField] private DistanceJoint2D _joint;
-		//[SerializeField] private SpringJoint2D _springJoint;
         [SerializeField] private AudioClip _inflateCip;
         [SerializeField] private AudioClip _popClip;
         [SerializeField] private LineRenderer _line;
@@ -30,7 +32,6 @@ namespace BalloonBasket {
                 this._ship = value;
                 if(this._ship != null) {
                     this._joint.connectedBody = this.Ship.rigidbody2D;
-					//this._springJoint.connectedBody = this.Ship.rigidbody2D;
                 }
             }
         }
@@ -61,7 +62,6 @@ namespace BalloonBasket {
         public void Pop() {
             this.audio.PlayOneShot(this._popClip);
             this._joint.connectedBody = null;
-			//this._springJoint.connectedBody = null;
             this._popAnim.onFinish = this.OnPopDone;
             this._popAnim.Play();
         }
@@ -77,7 +77,6 @@ namespace BalloonBasket {
 
         public void SetJointDistance(float distance) {
             this._joint.distance = distance;
-			//this._springJoint.distance = distance;
         }
         
 		void OnCollisionEnter2D(Collision2D collision) {

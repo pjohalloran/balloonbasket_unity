@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BalloonBasket {
+namespace BalloonBasket.Tech {
     [RequireComponent(typeof(SpriteRenderer))]
     public class SpriteAnimation : MonoBehaviour {
         public delegate void OnStart();
@@ -50,7 +50,7 @@ namespace BalloonBasket {
             }
         }
 
-        void Awake() {
+        private void Awake() {
             this._frameTime = _duration / _frameCount;
             this._frames = new List<Texture2D>(this._frameCount);
             for(int i = 0; i < this._frameCount; ++i) {
@@ -61,7 +61,7 @@ namespace BalloonBasket {
             Reset();
         }
 
-        void Update() {
+        private void Update() {
             if(this._play && !this._pause) {
                 this._currTime += Time.deltaTime;
                 if(this._currTime > this._currIndex*this._frameTime) {
@@ -75,7 +75,6 @@ namespace BalloonBasket {
                                                             new Rect(0f, 0f, t.width, t.height),
                                                             new Vector2(0.5f, 0.5f), 1f);
                     } else {
-                        // done
                         this._play = false;
                         if(this.onFinish != null) {
                             this.onFinish();

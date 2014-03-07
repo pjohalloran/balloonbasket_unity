@@ -2,10 +2,14 @@ using System.Collections;
 
 using UnityEngine;
 
+using BalloonBasket.Tech;
 
 namespace BalloonBasket {
     public class Gust : MonoBehaviour {
 		public static readonly string PREFAB_NAME = "Gust";
+
+		private static readonly string SMALL_ANIM_NAME = "GustSmall";
+		private static readonly string LARGE_ANIM_NAME = "GustLarge";
 
         [SerializeField] private SpriteRenderer _sprite;
         [SerializeField] private SpriteAnimation _gustAnim;
@@ -15,10 +19,10 @@ namespace BalloonBasket {
             int res = Random.Range(0, 2);
 
             if(res == 1) {
-                this._gustAnim.AnimPrefix = "GustSmall";
+                this._gustAnim.AnimPrefix = Gust.SMALL_ANIM_NAME;
                 this._gustAnim.FrameCount = 12;
             } else {
-                this._gustAnim.AnimPrefix = "GustLarge";
+                this._gustAnim.AnimPrefix = Gust.LARGE_ANIM_NAME;
                 this._gustAnim.FrameCount = 12;
                 this._force = this._force * 2.0f;
             }

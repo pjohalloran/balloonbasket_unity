@@ -2,11 +2,8 @@ using System;
 
 using UnityEngine;
 
-namespace BalloonBasket {
+namespace BalloonBasket.Tech {
 	public class Utils {
-		public Utils () {
-		}
-
         public static Mesh CreateMesh(Vector2 dimensions) {
             Mesh mesh = new Mesh();
             
