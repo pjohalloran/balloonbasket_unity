@@ -22,6 +22,7 @@ namespace BalloonBasket.Game {
 
         private List<Balloon> _balloons;
 		private GameObjectPool _balloonPool;
+		private bool _balloonChangeInProgress = false;
 
 		public Vector2 BobbingRange = new Vector2(1500f, 3000f);
 
@@ -68,6 +69,7 @@ namespace BalloonBasket.Game {
         private void OnBalloonPopped(Balloon balloon) {
             this._balloons.Remove(balloon);
 			this._balloonPool.Destroy(balloon.gameObject);
+			this._balloonChangeInProgress = false;
         }
 
         void Update() {
@@ -89,12 +91,13 @@ namespace BalloonBasket.Game {
 
 			int oldCount = this._balloons.Count;
             if(Input.GetKeyDown(KeyCode.O)) {
-                if(this._balloons.Count < this._maxBalloonCount) {
+				if(!this._balloonChangeInProgress && this._balloons.Count < this._maxBalloonCount) {
                     this._balloons.Add(InstantiateBalloon(this.transform.localPosition + new Vector3(0.0f, 150f, 0.0f)));
                 }
             }
             if(Input.GetKeyDown(KeyCode.P)) {
-                if(this._balloons.Count > 0) {
+				if(!this._balloonChangeInProgress && this._balloons.Count > 0) {
+					this._balloonChangeInProgress = true;
                     this._balloons[this._balloons.Count-1].Pop();
                 }
             }

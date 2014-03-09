@@ -86,8 +86,12 @@ namespace BalloonBasket.Game {
 		}
 
 		private void UpdateScenery(Transform parent, float baseSpeed) {
+			float halfScreenWidth = Screen.width * 0.5f;
+			float graceX = 200f;
+			float maxLayerX = (1f / parent.localScale.x) * halfScreenWidth + graceX;
+
 			foreach(Transform t in parent) {
-				if(t.localPosition.x < -600f) {
+				if(t.localPosition.x < -maxLayerX) {
 					Destroy(t.gameObject);
 				} else {
 					t.localPosition -= new Vector3(baseSpeed * this._speed.x * Time.deltaTime, 0.0f, 0.0f);
@@ -132,8 +136,6 @@ namespace BalloonBasket.Game {
 			float halfScreenHeight = Screen.height * 0.5f;
 			float maxLayerX = 0f;
 			float maxLayerY = 0f;
-
-			layerRes = 1; // TODO remove
 
             if(layerRes == 1) {
                 t = this._nearLayer;
