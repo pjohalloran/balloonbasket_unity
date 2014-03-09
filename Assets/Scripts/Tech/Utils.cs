@@ -61,8 +61,13 @@ namespace BalloonBasket.Tech {
         }
 
         public static void InitTexture(GameObject go, Transform parent, string textureName, string shaderName) {
-            go.AddComponent<MeshRenderer>();
-            MeshFilter filter = go.AddComponent<MeshFilter>();
+            if(go.GetComponent<MeshRenderer>() == null) {
+				go.AddComponent<MeshRenderer>();
+			}
+			MeshFilter filter = go.GetComponent<MeshFilter>();
+			if(filter == null) {
+				filter = go.AddComponent<MeshFilter>();
+			}
             
             filter.mesh = Utils.CreateMesh(Vector2.one);
 

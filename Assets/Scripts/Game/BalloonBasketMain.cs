@@ -54,12 +54,7 @@ namespace BalloonBasket.Game {
             this._lastGustTime = Time.time;
         }
 
-        private void UpdateBgScroll() {
-            Vector2 curr = this._bg.renderer.material.GetTextureOffset("_MainTex");
-            this._bg.renderer.material.SetTextureOffset("_MainTex", curr + new Vector2(Mathf.Clamp01(Time.deltaTime*_speed.x), Mathf.Clamp01(Time.deltaTime*_speed.y)));
-        }
-
-    	void Update () {
+    	private void Update () {
             UpdateBgScroll();
 
             float scrollTimeDiff = Time.time - this._lastExplosionTime;
@@ -80,28 +75,25 @@ namespace BalloonBasket.Game {
 //                }
 //            }
 
-            foreach(Transform t in this._nearLayer) {
-                if(t.localPosition.x < -600f) {
-                    Destroy(t.gameObject);
-                } else {
-                    t.localPosition -= new Vector3(this._nearSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
-                }
-            }
-            foreach(Transform t in this._midLayer) {
-                if(t.localPosition.x < -600f) {
-                    Destroy(t.gameObject);
-                } else {
-                    t.localPosition -= new Vector3(this._midSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
-                }
-            }
-            foreach(Transform t in this._farLayer) {
-                if(t.localPosition.x < -600f) {
-                    Destroy(t.gameObject);
-                } else {
-                    t.localPosition -= new Vector3(this._farSpeed*this._speed.x*Time.deltaTime, 0.0f, 0.0f);
-                }
-            }
+			UpdateScenery(this._nearLayer, this._nearSpeed);
+			UpdateScenery(this._midLayer, this._midSpeed);
+			UpdateScenery(this._farLayer, this._farSpeed);
         }
+
+		private void UpdateBgScroll() {
+			Vector2 curr = this._bg.renderer.material.GetTextureOffset("_MainTex");
+			this._bg.renderer.material.SetTextureOffset("_MainTex", curr + new Vector2(Mathf.Clamp01(Time.deltaTime*_speed.x), Mathf.Clamp01(Time.deltaTime*_speed.y)));
+		}
+
+		private void UpdateScenery(Transform parent, float baseSpeed) {
+			foreach(Transform t in parent) {
+				if(t.localPosition.x < -600f) {
+					Destroy(t.gameObject);
+				} else {
+					t.localPosition -= new Vector3(baseSpeed * this._speed.x * Time.deltaTime, 0.0f, 0.0f);
+				}
+			}
+		}
         
         private void MakeMine() {
             if(this._spawnItems && this._currObstacles < this._maxObstacles) {
@@ -135,34 +127,42 @@ namespace BalloonBasket.Game {
         private void MakeRandomBg() {
             int layerRes = Random.Range(0, 3);
             Transform t = null;
-
             Vector3 position = Vector3.zero;
+			float halfScreenWidth = Screen.width * 0.5f;
+			float halfScreenHeight = Screen.height * 0.5f;
+			float maxLayerX = 0f;
+			float maxLayerY = 0f;
+
+			layerRes = 1; // TODO remove
 
             if(layerRes == 1) {
                 t = this._nearLayer;
-                position.x = Random.Range(-550f, 600f);
             } else if(layerRes == 2){
                 t = this._midLayer;
-				position.x = Random.Range(-550f, 600f);
             } else {
                 t = this._farLayer;
-				position.x = Random.Range(-550f, 600f);
             }
+
+			float graceX = 200f;
+
+			maxLayerX = (1f / t.localScale.x) * halfScreenWidth + graceX;
+			maxLayerY = (1f / t.localScale.y) * halfScreenHeight;
+			position.x = maxLayerX;
+			position.y = Random.Range(-maxLayerY, maxLayerY);
 
             int typeRes = Random.Range(0, 4);
             Texture2D tex = null;
 
             if(typeRes == 1) {
                 tex = Utils.LoadResource("Cloud"+Random.Range(1, 5)) as Texture2D;
-				position.y = Random.Range(-100f, 384f);
+				position.y = Random.Range(-100f, maxLayerY);
             } else if(typeRes == 2) {
                 tex = Utils.LoadResource("Ground"+Random.Range(1, 6)) as Texture2D;
-                position.y = -512f;
+				position.y = -maxLayerY;
             } else if(typeRes == 3) {
                 tex = Utils.LoadResource("Tree"+Random.Range(1, 2)) as Texture2D;
-                position.y = -512f;
+				position.y = -maxLayerY;
             } else {
-				position.y = Random.Range(-384f, 384f);
                 InstantiateBg(position, "Gust", this._nearLayer);
             }
 

@@ -21,11 +21,18 @@ namespace BalloonBasket.Game {
 		[SerializeField] private SliderJoint2D _sliderJoint;
 
         private List<Balloon> _balloons;
+		private GameObjectPool _balloonPool;
 
 		public Vector2 BobbingRange = new Vector2(1500f, 3000f);
 
         void Start() {
 			this.transform.localPosition = Vector3.zero;
+
+			this._balloonPool = this.gameObject.AddComponent<GameObjectPool>();
+			this._balloonPool.ResourceId = Balloon.PREFAB_NAME;
+			this._balloonPool.Size = this._maxBalloonCount;
+			this._balloonPool.CreatePool();
+
 			this._balloons = new List<Balloon>(this._maxBalloonCount);
 			for(int i = 0; i < this._startBalloonCount; ++i) {
 				this._balloons.Add(InstantiateBalloon(this._lineEndpoint.transform.localPosition + new Vector3(0.0f, 150f, 0.0f)));
@@ -38,7 +45,8 @@ namespace BalloonBasket.Game {
         }
 
         private Balloon InstantiateBalloon(Vector3 position) {
-            GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource(Balloon.PREFAB_NAME) as GameObject);
+            //GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource(Balloon.PREFAB_NAME) as GameObject);
+			GameObject obj = this._balloonPool.Instantiate();
             Vector3 origScale = obj.transform.localScale;
             obj.transform.parent = main.dynamicRoot;
             Utils.SetTransform(obj.transform, position, origScale);
@@ -59,6 +67,7 @@ namespace BalloonBasket.Game {
 
         private void OnBalloonPopped(Balloon balloon) {
             this._balloons.Remove(balloon);
+			this._balloonPool.Destroy(balloon.gameObject);
         }
 
         void Update() {
@@ -96,16 +105,16 @@ namespace BalloonBasket.Game {
 		private void UpdateSliderPosition(int oldCount) {
 			int count = this._balloons.Count;
 			JointTranslationLimits2D limits = new JointTranslationLimits2D();
-			if(count >= 12) {
+			if(count > 12) {
 				limits.min = 150f;
 				limits.max = 250f;
-			} else if(count >= 9) {
+			} else if(count > 9) {
 				limits.min = 50f;
 				limits.max = 150f;
-			} else if(count >= 6) {
+			} else if(count > 6) {
 				limits.min = -50f;
 				limits.max = 50f;
-			} else if(count >= 3) {
+			} else if(count > 3) {
 				limits.min = -150f;
 				limits.max = -50f;
 			} else {

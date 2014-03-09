@@ -5,7 +5,7 @@ using UnityEngine;
 using BalloonBasket.Tech;
 
 namespace BalloonBasket.Game {
-    public class Balloon : MonoBehaviour {
+    public class Balloon : MonoBehaviour, PoolObject {
 		public static readonly string PREFAB_NAME = "Balloon";
 
         public delegate void OnPopped(Balloon balloon);
@@ -36,10 +36,15 @@ namespace BalloonBasket.Game {
             }
         }
 
-        void Start() {
-            Inflate();
+		#region PoolObject interface
+		public void Init() {
+			Inflate();
 			this._sprite.color = this._color[Random.Range(0, this._color.Length-1)];
-        }
+		}
+
+		public void Destroy() {
+		}
+		#endregion
 
         void Update() {
 			this._line.SetPosition(0, this._lineEndpoint.transform.position);
@@ -67,12 +72,10 @@ namespace BalloonBasket.Game {
         }
 
         private void OnPopDone() {
-            if(this.onPopped != null) {
-                this.onPopped(this);
-            }
-
             this._popAnim.Stop();
-            Destroy(this.gameObject);
+			if(this.onPopped != null) {
+				this.onPopped(this);
+			}
         }
 
         public void SetJointDistance(float distance) {
