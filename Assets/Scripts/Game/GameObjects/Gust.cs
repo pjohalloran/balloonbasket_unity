@@ -13,7 +13,7 @@ namespace BalloonBasket.Game {
 
         [SerializeField] private SpriteRenderer _sprite;
         [SerializeField] private SpriteAnimation _gustAnim;
-        [SerializeField] private Vector2 _force = new Vector2(10.0f, 0.0f);
+        [SerializeField] private Vector2 _force = new Vector2(400.0f, 0.0f);
 
         void Start() {
             int res = Random.Range(0, 2);
@@ -33,7 +33,7 @@ namespace BalloonBasket.Game {
         void Update() {
         }
 
-        void OnTrigger2DEnter(Collider2D other) {
+        void OnTriggerEnter2D(Collider2D other) {
             GustEvents.TriggerGustEnter();
             other.rigidbody2D.AddForce(this._force);
         }

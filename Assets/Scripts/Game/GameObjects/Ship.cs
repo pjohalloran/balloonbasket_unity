@@ -46,7 +46,6 @@ namespace BalloonBasket.Game {
         }
 
         private Balloon InstantiateBalloon(Vector3 position) {
-            //GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource(Balloon.PREFAB_NAME) as GameObject);
 			GameObject obj = this._balloonPool.Instantiate();
             Vector3 origScale = obj.transform.localScale;
             obj.transform.parent = main.dynamicRoot;

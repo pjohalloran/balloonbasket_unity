@@ -15,6 +15,7 @@ namespace BalloonBasket.Game {
         [SerializeField] private float _farSpeed = 0.1f;
         [SerializeField] private GameObject _bg;
         [SerializeField] public Transform dynamicRoot;
+		[SerializeField] public Transform obstacleRoot;
         [SerializeField] private Vector2 _speed = new Vector2(0.1f, 0.0f);
         [SerializeField] private AnimationCurve _scrollCurve;
         [SerializeField] private AnimationCurve _spawnCurve;
@@ -39,7 +40,7 @@ namespace BalloonBasket.Game {
             this._lastExplosionTime = 0.0f;
             this._lastGustTime = 0.0f;
 
-            //Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time % 10.0f));
+            Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time % 10.0f));
             Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time % 10.0f));
 
             GustEvents.OnGustEnterDelegate += this.OnGust;
@@ -55,26 +56,19 @@ namespace BalloonBasket.Game {
         }
 
     	private void Update () {
-            UpdateBgScroll();
-
             float scrollTimeDiff = Time.time - this._lastExplosionTime;
-            float speedScroll = this._scrollCurve.Evaluate(scrollTimeDiff);
+            float speedScroll = this._scrollCurve.Evaluate(scrollTimeDiff) * 500f;
 
             float gustTimeDiff = Time.time - this._lastGustTime;
             float speedGust = 0f;
             if(gustTimeDiff > 0f) {
-                speedGust = this._gustCurve.Evaluate(gustTimeDiff);
+                speedGust = this._gustCurve.Evaluate(gustTimeDiff) * 500f;
             }
 
-            this._speed.x = Mathf.Clamp01(Mathf.Max(speedScroll, speedGust));
+			this._speed.x = Mathf.Max(speedScroll, speedGust);
 
-//            foreach(Transform t in this.dynamicRoot.transform) {
-//                if(t.localPosition.x < -1.5f || t.localPosition.x > 2.0f || t.localPosition.y > 1.5f) {
-//                    Destroy(t.gameObject);
-//                    --this._currObstacles;
-//                }
-//            }
-
+			UpdateBgScroll();
+			CheckObstacles();
 			UpdateScenery(this._nearLayer, this._nearSpeed);
 			UpdateScenery(this._midLayer, this._midSpeed);
 			UpdateScenery(this._farLayer, this._farSpeed);
@@ -82,7 +76,19 @@ namespace BalloonBasket.Game {
 
 		private void UpdateBgScroll() {
 			Vector2 curr = this._bg.renderer.material.GetTextureOffset("_MainTex");
-			this._bg.renderer.material.SetTextureOffset("_MainTex", curr + new Vector2(Mathf.Clamp01(Time.deltaTime*_speed.x), Mathf.Clamp01(Time.deltaTime*_speed.y)));
+			this._bg.renderer.material.SetTextureOffset("_MainTex", curr + new Vector2(Time.deltaTime*_speed.x * 0.001f, Time.deltaTime*_speed.y * 0.001f));
+		}
+
+		private void CheckObstacles() {
+			float halfScreenWidth = Screen.width * 0.5f;
+			foreach(Transform t in this.obstacleRoot.transform) {
+				if(t.localPosition.x < -halfScreenWidth) {
+					Destroy(t.gameObject);
+					--this._currObstacles;
+				} else {
+					t.localPosition -= new Vector3(this._speed.x * Time.deltaTime, 0.0f, 0.0f);
+				}
+			}
 		}
 
 		private void UpdateScenery(Transform parent, float baseSpeed) {
@@ -101,7 +107,9 @@ namespace BalloonBasket.Game {
         
         private void MakeMine() {
             if(this._spawnItems && this._currObstacles < this._maxObstacles) {
-                GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.1f), Random.Range(-1.0f, 1.0f), 0.0f), Mine.PREFAB_NAME);
+				float halfScreenWidth = Screen.width * 0.5f;
+				float halfScreenHeight = Screen.height * 0.5f;
+				GameObject obj = InstantiateObstacle(new Vector3(halfScreenWidth+200f, Random.Range(-halfScreenHeight, halfScreenHeight), 0f), Mine.PREFAB_NAME);
                 obj.GetComponent<Mine>()._explodeAnim.onFinish += this.OnMineDestroy;
                 obj.GetComponent<Mine>().onExplodeShip += this.OnMineCollideShip;
             }
@@ -109,7 +117,9 @@ namespace BalloonBasket.Game {
 
         private void MakeGull() {
             if(this._spawnItems && this._currObstacles < this._maxObstacles) {
-                GameObject obj = InstantiateObstacle(new Vector3(Random.Range(1.0f, 1.5f), Random.Range(-1.0f, 1.0f), 0.0f), Gull.PREFAB_NAME);
+				float halfScreenWidth = Screen.width * 0.5f;
+				float halfScreenHeight = Screen.height * 0.5f;
+				GameObject obj = InstantiateObstacle(new Vector3(halfScreenWidth+200f, Random.Range(-halfScreenHeight, halfScreenHeight), 0f), Gull.PREFAB_NAME);
                 obj.GetComponent<Gull>().onDeath = this.OnGullDestroy;
             }
         }
@@ -192,7 +202,7 @@ namespace BalloonBasket.Game {
         private GameObject InstantiateObstacle(Vector3 position, string prefabName) {
             GameObject obj = (GameObject)GameObject.Instantiate(Utils.LoadResource(prefabName));
             Vector3 origScale = obj.transform.localScale;
-            obj.transform.parent = this.dynamicRoot;
+            obj.transform.parent = this.obstacleRoot;
             Utils.SetTransform(obj.transform, position, origScale);
             obj.rigidbody2D.AddForce(new Vector2(-_speed.x*100.0f, 0.0f));
             ++this._currObstacles;
