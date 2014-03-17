@@ -6,6 +6,7 @@ using BalloonBasket.Tech;
 
 namespace BalloonBasket.Game {
     public class BalloonBasketMain : MonoBehaviour {
+		[SerializeField] private TextMesh _timer;
         [SerializeField] private Transform _staticRoot;
         [SerializeField] private Transform _nearLayer;
         [SerializeField] private float _nearSpeed = 0.5f;
@@ -40,8 +41,8 @@ namespace BalloonBasket.Game {
             this._lastExplosionTime = 0.0f;
             this._lastGustTime = 0.0f;
 
-            Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time % 10.0f));
-            Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time % 10.0f));
+            Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time));
+            Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time));
 
             GustEvents.OnGustEnterDelegate += this.OnGust;
     	}
@@ -56,6 +57,8 @@ namespace BalloonBasket.Game {
         }
 
     	private void Update () {
+			this._timer.text = string.Format("Time: {0}", Time.time);
+
             float scrollTimeDiff = Time.time - this._lastExplosionTime;
             float speedScroll = this._scrollCurve.Evaluate(scrollTimeDiff) * 500f;
 
@@ -133,12 +136,11 @@ namespace BalloonBasket.Game {
                 MakeGull();
             }
 
-            float nextTime = this._spawnCurve.Evaluate(Time.time % 10.0f);
             //Debug.Log ("Spawning again in "+nextTime);
-            Invoke("MakeRandomObstacle", nextTime);
-        }
-
-        private void MakeRandomBg() {
+			Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time));
+		}
+		
+		private void MakeRandomBg() {
             int layerRes = Random.Range(0, 3);
             Transform t = null;
             Vector3 position = Vector3.zero;
@@ -186,7 +188,7 @@ namespace BalloonBasket.Game {
                 obj.GetComponent<SpriteRenderer>().sortingOrder = layerRes;
             }
 
-            float nextTime = this._spawnCurve.Evaluate(Time.time % 10.0f);
+            float nextTime = this._spawnCurve.Evaluate(Time.time);
             //Debug.Log ("Spawning again in "+nextTime);
             Invoke("MakeRandomBg", nextTime);
         }

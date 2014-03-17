@@ -92,7 +92,6 @@ namespace BalloonBasket.Tech {
 				AddToPool(copy);
 			}
 
-			GameObject.Destroy(go);
 			go = null;
 		}
 
