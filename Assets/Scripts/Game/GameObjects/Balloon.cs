@@ -89,8 +89,8 @@ namespace BalloonBasket.Game {
         
 		void OnCollisionEnter2D(Collision2D collision) {
             if(collision.rigidbody != null && 
-               (collision.rigidbody.gameObject.GetComponent<Mine>() != null ||
-               collision.rigidbody.gameObject.GetComponent<Gull>() != null)) {
+            	(collision.rigidbody.gameObject.GetComponent<Mine>() != null ||
+            	collision.rigidbody.gameObject.GetComponent<Gull>() != null)) {
                 Pop();
             }
         }

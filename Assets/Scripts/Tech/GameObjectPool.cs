@@ -81,7 +81,6 @@ namespace BalloonBasket.Tech {
 			GameObject go = Utils.LoadResource(this._resource) as GameObject;
 			if(GetPoolObject(go) == null) {
 				Debug.LogError(string.Format("Cannot use {0} in pool {1} as it doesn't impleemnted PoolObject interface!"));
-				GameObject.Destroy(go);
 				go = null;
 				return;
 			}
