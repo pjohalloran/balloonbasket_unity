@@ -23,10 +23,12 @@ namespace BalloonBasket.Game {
         private List<Balloon> _balloons;
 		private GameObjectPool _balloonPool;
 		private bool _balloonChangeInProgress = false;
+		private Buttons _buttons;
 
 		public Vector2 BobbingRange = new Vector2(1500f, 3000f);
 
         void Start() {
+			this._buttons = this.GetComponent<Buttons> ();
 			this.transform.localPosition = Vector3.zero;
 
 			this._balloonPool = this.gameObject.AddComponent<GameObjectPool>();
@@ -37,7 +39,7 @@ namespace BalloonBasket.Game {
 			this._balloons = new List<Balloon>(this._maxBalloonCount);
 			for(int i = 0; i < this._startBalloonCount; ++i) {
 				this._balloons.Add(InstantiateBalloon(this._lineEndpoint.transform.localPosition + new Vector3(0.0f, 150f, 0.0f)));
-            }
+			}
 
 			this._sliderJoint.connectedBody = GameObject.Find(Ship.ANCHOR_NAME).GetComponent<Rigidbody2D>();
 			this.BobbingRange = new Vector2(500f, 750f);
@@ -55,6 +57,7 @@ namespace BalloonBasket.Game {
             balloon.Ship = this;
             balloon.SetJointDistance(Random.Range(150f, 200f));
             balloon.onPopped += this.OnBalloonPopped;
+			balloon.onPumped += this.OnBalloonPumped;
             return balloon;
         }
 
@@ -71,30 +74,37 @@ namespace BalloonBasket.Game {
 			this._balloonChangeInProgress = false;
         }
 
+		private void OnBalloonPumped(Balloon balloon) {
+			this._balloonChangeInProgress = false;
+		}
+
         void Update() {
+			this._buttons.PollState ();
+
             Vector3 shipOffset = Vector2.zero;
-            if(Input.GetKeyDown(KeyCode.A)) {
+			if(Input.GetKeyDown(KeyCode.A) || this._buttons.LeftPressed) {
                 shipOffset.x -= force.x;
             }
-            if(Input.GetKeyDown(KeyCode.D)) {
+			if(Input.GetKeyDown(KeyCode.D) || this._buttons.RightPressed) {
                 shipOffset.x += force.x;
             }
-            if(Input.GetKeyDown(KeyCode.W)) {
+			if(Input.GetKeyDown(KeyCode.W) || this._buttons.UpPressed) {
                 shipOffset.y += force.y;
             }
-            if(Input.GetKeyDown(KeyCode.S)) {
+			if(Input.GetKeyDown(KeyCode.S) || this._buttons.DownPressed) {
                 shipOffset.y -= force.y;
             }
             
             this.rigidbody2D.AddForce(shipOffset);
 
 			int oldCount = this._balloons.Count;
-            if(Input.GetKeyDown(KeyCode.O)) {
+			if(Input.GetKeyDown(KeyCode.O) || this._buttons.CrossPressed) {
 				if(!this._balloonChangeInProgress && this._balloons.Count < this._maxBalloonCount) {
+					this._balloonChangeInProgress = true;
                     this._balloons.Add(InstantiateBalloon(this.transform.localPosition + new Vector3(0.0f, 150f, 0.0f)));
                 }
             }
-            if(Input.GetKeyDown(KeyCode.P)) {
+			if(Input.GetKeyDown(KeyCode.P) || this._buttons.TrianglePressed) {
 				if(!this._balloonChangeInProgress && this._balloons.Count > 0) {
 					this._balloonChangeInProgress = true;
                     this._balloons[this._balloons.Count-1].Pop();

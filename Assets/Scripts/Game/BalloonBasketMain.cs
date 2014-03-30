@@ -28,8 +28,11 @@ namespace BalloonBasket.Game {
         private int _currObstacles = 0;
         private float _lastExplosionTime;
         private float _lastGustTime;
+		private Buttons _buttons;
 
     	void Start () {
+			this._buttons = this.GetComponent<Buttons>();
+
             Utils.InitTexture(this._bg, _staticRoot, "BackgroundFinal", "Unlit/Transparent");
             this._bg.transform.localScale = new Vector3(512f, 384f, 1f);
 
@@ -57,6 +60,13 @@ namespace BalloonBasket.Game {
         }
 
     	private void Update () {
+			this._buttons.PollState ();
+
+			if (this._buttons.StartPressed) {
+				// reload level
+				Application.LoadLevel("game");
+			}
+
 			this._timer.text = string.Format("Time: {0}", Time.time);
 
             float scrollTimeDiff = Time.time - this._lastExplosionTime;
@@ -137,7 +147,7 @@ namespace BalloonBasket.Game {
             }
 
             //Debug.Log ("Spawning again in "+nextTime);
-			Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time));
+			Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time)*5f);
 		}
 		
 		private void MakeRandomBg() {

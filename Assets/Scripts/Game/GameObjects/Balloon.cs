@@ -9,6 +9,7 @@ namespace BalloonBasket.Game {
 		public static readonly string PREFAB_NAME = "Balloon";
 
         public delegate void OnPopped(Balloon balloon);
+		public delegate void OnPumped(Balloon balloon);
 
         [SerializeField] private SpriteAnimation _popAnim;
         [SerializeField] private SpriteAnimation _inflateAnim;
@@ -22,6 +23,7 @@ namespace BalloonBasket.Game {
 		[SerializeField] private GameObject _lineEndpoint;
 
         public OnPopped onPopped;
+		public OnPumped onPumped;
 
         private Ship _ship;
         public Ship Ship {
@@ -62,6 +64,9 @@ namespace BalloonBasket.Game {
             this._sprite.sprite = Sprite.Create(this._defaultImage,
                                          new Rect(0f, 0f, this._defaultImage.width, this._defaultImage.height),
                                          new Vector2(0.5f, 0.5f), 1f);
+			if (this.onPumped != null) {
+				this.onPumped(this);
+			}
         }
 
         public void Pop() {

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8d1b9013fd483489a8766280727150c5
+guid: 814651139e83e5041b454a9b5c44996d
 TextureImporter:
   serializedVersion: 2
   mipmaps:
@@ -24,31 +24,26 @@ TextureImporter:
   maxTextureSize: 1024
   textureSettings:
     filterMode: 0
-    aniso: 1
+    aniso: -1
     mipBias: -1
-    wrapMode: 0
-  nPOTScale: 1
+    wrapMode: -1
+  nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 0
-  spriteExtrude: 0
+  spriteMode: 2
+  spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: .5, y: .5}
   spritePixelsToUnits: 1
-  alphaIsTransparency: 0
-  textureType: 5
-  buildTargetSettings: []
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings:
+  - buildTarget: iPhone
+    maxTextureSize: 1024
+    textureFormat: -2
+    compressionQuality: 50
   spriteSheet:
-    sprites:
-    - name: BackgroundFinal
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1024
-        height: 1024
-      alignment: 0
-      pivot: {x: .5, y: .5}
-  spritePackingTag: 
+    sprites: []
+  spritePackingTag: ingame
   userData: 
