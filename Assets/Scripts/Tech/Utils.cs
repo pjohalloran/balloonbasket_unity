@@ -90,6 +90,13 @@ namespace BalloonBasket.Tech {
             }
             return level.text;
         }
+
+		public static string SecondsToTimeString(float seconds) {
+			int millis = (int)((float)Math.Round((double)(seconds - Mathf.Floor(seconds)), 2, MidpointRounding.ToEven) * 100f);
+			int mins = Mathf.FloorToInt(seconds / 60f);
+			int secs = Mathf.FloorToInt(seconds % 60f);
+			return string.Format("{0} : {1} : {2}", mins.ToString("00"), secs.ToString("00"), millis.ToString("00"));
+		}
 	}
 }
 

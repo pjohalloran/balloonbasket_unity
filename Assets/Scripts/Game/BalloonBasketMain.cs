@@ -6,7 +6,7 @@ using BalloonBasket.Tech;
 
 namespace BalloonBasket.Game {
     public class BalloonBasketMain : MonoBehaviour {
-		[SerializeField] private TextMesh _timer;
+		[SerializeField] private ScoreBoard _timer;
         [SerializeField] private Transform _staticRoot;
         [SerializeField] private Transform _nearLayer;
         [SerializeField] private float _nearSpeed = 0.5f;
@@ -67,7 +67,7 @@ namespace BalloonBasket.Game {
 				Application.LoadLevel("game");
 			}
 
-			this._timer.text = string.Format("Time: {0}", Time.time);
+			this._timer.SetScore(Time.time);
 
             float scrollTimeDiff = Time.time - this._lastExplosionTime;
             float speedScroll = this._scrollCurve.Evaluate(scrollTimeDiff) * 500f;
@@ -95,7 +95,7 @@ namespace BalloonBasket.Game {
 		private void CheckObstacles() {
 			float halfScreenWidth = Screen.width * 0.5f;
 			foreach(Transform t in this.obstacleRoot.transform) {
-				if(t.localPosition.x < -halfScreenWidth) {
+				if(t.localPosition.x < -halfScreenWidth - 400f) {
 					Destroy(t.gameObject);
 					--this._currObstacles;
 				} else {
@@ -106,7 +106,7 @@ namespace BalloonBasket.Game {
 
 		private void UpdateScenery(Transform parent, float baseSpeed) {
 			float halfScreenWidth = Screen.width * 0.5f;
-			float graceX = 200f;
+			float graceX = 600f;
 			float maxLayerX = (1f / parent.localScale.x) * halfScreenWidth + graceX;
 
 			foreach(Transform t in parent) {
@@ -137,14 +137,26 @@ namespace BalloonBasket.Game {
             }
         }
 
+		private void MakeFlag() {
+			if(this._spawnItems && this._currObstacles < this._maxObstacles) {
+				float halfScreenWidth = Screen.width * 0.5f;
+				float halfScreenHeight = Screen.height * 0.5f;
+				GameObject obj = InstantiateObstacle(new Vector3(halfScreenWidth+200f, Random.Range(-halfScreenHeight, halfScreenHeight), 0f), Flag.PREFAB_NAME);
+				obj.GetComponent<Flag>().onShipEnter -= this.OnShipHitFlag;
+				obj.GetComponent<Flag>().onShipEnter += this.OnShipHitFlag;
+			}
+		}
+
         private void MakeRandomObstacle() {
-            int res = Random.Range(0, 2);
+            int res = Random.Range(0, 3);
 
             if(res == 1) {
                 MakeMine();
-            } else {
+            } else if(res == 2){
                 MakeGull();
-            }
+            } else {
+				MakeFlag();
+			}
 
             //Debug.Log ("Spawning again in "+nextTime);
 			Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time)*5f);
@@ -216,7 +228,9 @@ namespace BalloonBasket.Game {
             Vector3 origScale = obj.transform.localScale;
             obj.transform.parent = this.obstacleRoot;
             Utils.SetTransform(obj.transform, position, origScale);
-            obj.rigidbody2D.AddForce(new Vector2(-_speed.x*100.0f, 0.0f));
+			if(obj.rigidbody2D != null) {
+            	obj.rigidbody2D.AddForce(new Vector2(-_speed.x*100.0f, 0.0f));
+			}
             ++this._currObstacles;
             return obj;
         }
@@ -232,5 +246,9 @@ namespace BalloonBasket.Game {
         private void OnGullDestroy(Gull gull) {
             --this._currObstacles;
         }
+
+		private void OnShipHitFlag() {
+			
+		}
     }
 }

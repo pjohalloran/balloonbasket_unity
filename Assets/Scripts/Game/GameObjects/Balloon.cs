@@ -94,5 +94,9 @@ namespace BalloonBasket.Game {
                 Pop();
             }
         }
+
+		void OnMouseUpAsButton() {
+			Pop();
+		}
     }
 }
