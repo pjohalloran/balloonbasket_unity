@@ -55,7 +55,6 @@ namespace BalloonBasket.Game {
         }
     	
         private void OnGust() {
-            Debug.Log("HIT GUST");
             this._lastGustTime = Time.time;
         }
 

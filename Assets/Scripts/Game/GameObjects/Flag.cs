@@ -12,7 +12,6 @@ namespace BalloonBasket.Game {
 
 		// TODO Cannot get trigger enter when other object is kinematic so workround using collide enter
 		private void OnTriggerEnter2D(Collider2D other) {
-			Debug.Log ("FLAG ENTER + " + other.gameObject.name);
 			if (other.gameObject.GetComponent<Ship> () != null) {
 				if(this.onShipEnter != null) {
 					this.onShipEnter();
@@ -22,7 +21,6 @@ namespace BalloonBasket.Game {
 		}
 
 		void OnCollisionEnter2D(Collision2D collision) {
-			Debug.Log ("FLAG COLLIDE + " + collision.gameObject.name);
 			if (collision.gameObject.GetComponent<Ship> () != null) {
 				if(this.onShipEnter != null) {
 					this.onShipEnter();

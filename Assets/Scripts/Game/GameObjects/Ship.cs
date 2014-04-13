@@ -136,14 +136,18 @@ namespace BalloonBasket.Game {
 			this._sliderJoint.limits = limits;
 
 			if(this.transform.localPosition.y < limits.min) {
-				CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
-				Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
-				Vector2 randomForce = GenerateRandomForce(true);
+				Debug.Log ("Ship too low");
+				//CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
+				//Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
+				//Vector2 randomForce = GenerateRandomForce(true);
+				Vector2 randomForce = new Vector2(0f, 10000f);
 				this.rigidbody2D.AddForce(randomForce);
 			} else if(this.transform.localPosition.y > limits.max) {
-				CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
-				Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
-				Vector2 randomForce = GenerateRandomForce(false);
+				Debug.Log ("Ship too high");
+				//CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
+				//Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
+				//Vector2 randomForce = GenerateRandomForce(false);
+				Vector2 randomForce = new Vector2(0f, -10000f);
 				this.rigidbody2D.AddForce(randomForce);
 			}
 		}

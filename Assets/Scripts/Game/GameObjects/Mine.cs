@@ -49,11 +49,11 @@ namespace BalloonBasket.Game {
             this.audio.PlayOneShot(this._explodeFx[Random.Range(0, this._explodeFx.Count-1)]);
             this._explodeAnim.onFinish += this.ExplodeDone;
             this._explodeAnim.Play();
+			this.rigidbody2D.Sleep();
         }
 
         private void ExplodeDone() {
             this._sprite.color = Color.clear;
-            this.rigidbody2D.Sleep();
             Destroy(this.gameObject);
         }
     }

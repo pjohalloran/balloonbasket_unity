@@ -21,6 +21,7 @@ namespace BalloonBasket.Game {
             this.audio.PlayOneShot(this._dieFx);
             this._dieAnim.onFinish = this.OnDieDone;
             this._dieAnim.Play();
+			this.rigidbody2D.Sleep();
         }
         
         private void OnDieDone() {
@@ -28,7 +29,6 @@ namespace BalloonBasket.Game {
                 this.onDeath(this);
             }
             this._sprite.color = Color.clear;
-            this.rigidbody2D.Sleep();
             this._dieAnim.Stop();
             Destroy(this.gameObject);
         }

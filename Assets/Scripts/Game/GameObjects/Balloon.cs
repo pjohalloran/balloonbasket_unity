@@ -91,7 +91,9 @@ namespace BalloonBasket.Game {
             if(collision.rigidbody != null && 
             	(collision.rigidbody.gameObject.GetComponent<Mine>() != null ||
             	collision.rigidbody.gameObject.GetComponent<Gull>() != null)) {
-                Pop();
+				if(collision.rigidbody.IsAwake()) {
+                	Pop();
+				}
             }
         }
 
