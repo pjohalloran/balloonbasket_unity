@@ -1,10 +1,12 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 
 using UnityEngine;
 
 using BalloonBasket.Tech;
+using BalloonBasket.Game;
 
-namespace BalloonBasket.Game {
+//namespace BalloonBasket.Game {
     public class BalloonBasketMain : MonoBehaviour {
 		[SerializeField] private ScoreBoard _timer;
         [SerializeField] private Transform _staticRoot;
@@ -22,13 +24,31 @@ namespace BalloonBasket.Game {
         [SerializeField] private AnimationCurve _spawnCurve;
         [SerializeField] private AnimationCurve _gustCurve;
 
-        [SerializeField] private bool _spawnItems = true;
+		[SerializeField] public List<Vector3> _lanePositions = new List<Vector3>(5);
+		[SerializeField] private float _timeBetweenColumns = 5f; // TODO probably not right to have a fixed time..
 
         private int _maxObstacles = 6;
         private int _currObstacles = 0;
         private float _lastExplosionTime;
         private float _lastGustTime;
 		private Buttons _buttons;
+		private float _lastColumnTime = 0;
+
+		private List<List<char>> _levelData = null;
+		private int _colIndex = 0;
+		private bool _random = true;
+
+		public void StartLevel(List<List<char>> levelData) {
+			this._levelData = levelData;
+			this._random = false;
+
+		}
+
+		public void StartRandom() {
+			this._random = true;
+			Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time));
+			Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time));
+		}
 
     	void Start () {
 			this._buttons = this.GetComponent<Buttons>();
@@ -43,9 +63,6 @@ namespace BalloonBasket.Game {
 
             this._lastExplosionTime = 0.0f;
             this._lastGustTime = 0.0f;
-
-            Invoke("MakeRandomObstacle", this._spawnCurve.Evaluate(Time.time));
-            Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time));
 
             GustEvents.OnGustEnterDelegate += this.OnGust;
     	}
@@ -84,7 +101,30 @@ namespace BalloonBasket.Game {
 			UpdateScenery(this._nearLayer, this._nearSpeed);
 			UpdateScenery(this._midLayer, this._midSpeed);
 			UpdateScenery(this._farLayer, this._farSpeed);
+
+			if(!this._random) {
+				CheckForNewColumn();
+			}
         }
+
+		private void CheckForNewColumn() {
+			if(Time.time - this._lastColumnTime >= this._timeBetweenColumns) {
+				bool flagMade = false;
+				for(int rowIndex = 0; rowIndex < this._levelData.Count; ++rowIndex) {
+					char c = this._levelData[rowIndex][this._colIndex];
+					if(c == LevelReader.O_MINE) {
+						MakeMine(rowIndex);
+					} else if(c == LevelReader.O_SEAGULL) {
+						MakeGull(rowIndex);
+					} else if(c == LevelReader.O_FINISH && !flagMade) {
+						MakeFlag(0);
+						flagMade = true;
+					}
+				}
+				++this._colIndex;
+				this._lastColumnTime = Time.time;
+			}
+		}
 
 		private void UpdateBgScroll() {
 			Vector2 curr = this._bg.renderer.material.GetTextureOffset("_MainTex");
@@ -117,44 +157,52 @@ namespace BalloonBasket.Game {
 			}
 		}
         
-        private void MakeMine() {
-            if(this._spawnItems && this._currObstacles < this._maxObstacles) {
-				float halfScreenWidth = Screen.width * 0.5f;
-				float halfScreenHeight = Screen.height * 0.5f;
-				GameObject obj = InstantiateObstacle(new Vector3(halfScreenWidth+200f, Random.Range(-halfScreenHeight, halfScreenHeight), 0f), Mine.PREFAB_NAME);
-                obj.GetComponent<Mine>()._explodeAnim.onFinish += this.OnMineDestroy;
-                obj.GetComponent<Mine>().onExplodeShip += this.OnMineCollideShip;
-            }
-        }
-
-        private void MakeGull() {
-            if(this._spawnItems && this._currObstacles < this._maxObstacles) {
-				float halfScreenWidth = Screen.width * 0.5f;
-				float halfScreenHeight = Screen.height * 0.5f;
-				GameObject obj = InstantiateObstacle(new Vector3(halfScreenWidth+200f, Random.Range(-halfScreenHeight, halfScreenHeight), 0f), Gull.PREFAB_NAME);
-                obj.GetComponent<Gull>().onDeath = this.OnGullDestroy;
-            }
-        }
-
-		private void MakeFlag() {
-			if(this._spawnItems && this._currObstacles < this._maxObstacles) {
-				float halfScreenWidth = Screen.width * 0.5f;
-				float halfScreenHeight = Screen.height * 0.5f;
-				GameObject obj = InstantiateObstacle(new Vector3(halfScreenWidth+200f, Random.Range(-halfScreenHeight, halfScreenHeight), 0f), Flag.PREFAB_NAME);
-				obj.GetComponent<Flag>().onShipEnter -= this.OnShipHitFlag;
-				obj.GetComponent<Flag>().onShipEnter += this.OnShipHitFlag;
+		private GameObject MakeObstacle(string prefabName, int lane) {
+			float halfScreenWidth = Screen.width * 0.5f;
+			float halfScreenHeight = Screen.height * 0.5f;
+			
+			Vector3 startPosition = Vector3.zero;
+			if(this._random) {
+				startPosition = new Vector3(halfScreenWidth+200f, Random.Range(-halfScreenHeight, halfScreenHeight), 0f);
+			} else {
+				startPosition = this._lanePositions[lane];
 			}
+			
+			return InstantiateObstacle(startPosition, prefabName);
+		}
+
+        private void MakeMine(int lane = -1) {
+			GameObject obj = MakeObstacle(Mine.PREFAB_NAME, lane);
+        	obj.GetComponent<Mine>()._explodeAnim.onFinish += this.OnMineDestroy;
+        	obj.GetComponent<Mine>().onExplodeShip += this.OnMineCollideShip;
+        }
+
+		private void MakeGull(int lane = -1) {
+			GameObject obj = MakeObstacle(Gull.PREFAB_NAME, lane);
+        	obj.GetComponent<Gull>().onDeath = this.OnGullDestroy;
+        }
+
+		private void MakeFlag(int lane = -1) {
+			GameObject obj = MakeObstacle(Flag.PREFAB_NAME, lane);
+			obj.GetComponent<Flag>().onShipEnter -= this.OnShipHitFlag;
+			obj.GetComponent<Flag>().onShipEnter += this.OnShipHitFlag;
+		}
+
+		private void MakeGust(int lane = -1) {
+			GameObject obj = MakeObstacle(Gust.PREFAB_NAME, lane);
 		}
 
         private void MakeRandomObstacle() {
-            int res = Random.Range(0, 3);
-
-            if(res == 1) {
-                MakeMine();
-            } else if(res == 2){
-                MakeGull();
-            } else {
-				MakeFlag();
+			if(this._random && this._currObstacles < this._maxObstacles) {
+				int res = Random.Range(0, 3);
+				
+				if(res == 1) {
+					MakeMine();
+				} else if(res == 2){
+					MakeGull();
+				} else {
+					MakeFlag();
+				}
 			}
 
             //Debug.Log ("Spawning again in "+nextTime);
@@ -194,10 +242,10 @@ namespace BalloonBasket.Game {
             } else if(typeRes == 2) {
                 tex = Utils.LoadResource("Ground"+Random.Range(1, 6)) as Texture2D;
 				position.y = -maxLayerY;
-            } else if(typeRes == 3) {
+			} else if(typeRes == 3) { // TODO: Move out for level data
                 tex = Utils.LoadResource("Tree"+Random.Range(1, 2)) as Texture2D;
 				position.y = -maxLayerY;
-            } else {
+            } else { // TODO: Move out for level data
                 InstantiateBg(position, "Gust", this._nearLayer);
             }
 
@@ -227,7 +275,7 @@ namespace BalloonBasket.Game {
             Vector3 origScale = obj.transform.localScale;
             obj.transform.parent = this.obstacleRoot;
             Utils.SetTransform(obj.transform, position, origScale);
-			if(obj.rigidbody2D != null) {
+			if(obj.rigidbody2D != null) { // TODO might not need this null check, think flag has a rigid body
             	obj.rigidbody2D.AddForce(new Vector2(-_speed.x*100.0f, 0.0f));
 			}
             ++this._currObstacles;
@@ -250,4 +298,4 @@ namespace BalloonBasket.Game {
 			
 		}
     }
-}
+//}

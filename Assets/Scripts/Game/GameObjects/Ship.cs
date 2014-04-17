@@ -118,19 +118,19 @@ namespace BalloonBasket.Game {
 			int count = this._balloons.Count;
 			JointTranslationLimits2D limits = new JointTranslationLimits2D();
 			if(count > 12) {
-				limits.min = 150f;
-				limits.max = 250f;
+				limits.min = 200f;
+				limits.max = 300f;
 			} else if(count > 9) {
-				limits.min = 50f;
-				limits.max = 150f;
+				limits.min = 100f;
+				limits.max = 200f;
 			} else if(count > 6) {
-				limits.min = -50f;
-				limits.max = 50f;
+				limits.min = 0f;
+				limits.max = 100f;
 			} else if(count > 3) {
-				limits.min = -150f;
-				limits.max = -50f;
+				limits.min = -200f;
+				limits.max = -100f;
 			} else {
-				limits.min = -275f;
+				limits.min = -300f;
 				limits.max = -200f;
 			}
 			this._sliderJoint.limits = limits;

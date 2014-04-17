@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using BalloonBasket.Tech;
+using BalloonBasket.Game;
 
 
 public class Menu : MonoBehaviour {
@@ -73,6 +74,12 @@ public class Menu : MonoBehaviour {
 	private void OnButtonClick(GameObject go) {
 		this.gameObject.SetActive (false);
 		this._gameHolder.SetActive (true);
+		int index = this._menuButtons.IndexOf(go.GetComponent<MenuButton>());
+		if(index != 3) {
+			this._gameHolder.GetComponent<BalloonBasketMain>().StartLevel(LevelReader.ParseLevel(string.Format("level{0}", index+1)));
+		} else {
+			this._gameHolder.GetComponent<BalloonBasketMain>().StartRandom();
+		}
 	}
 
 	void Update() {
