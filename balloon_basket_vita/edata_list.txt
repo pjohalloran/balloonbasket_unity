@@ -1,6 +1,0 @@
-Data\mainData, Plain
-Data\resources.assets, Plain
-Data\sharedassets0.assets, Plain
-Data\Managed\Assembly-CSharp-firstpass.dll, SignedAndEncrypted
-Data\Managed\Assembly-CSharp.dll, SignedAndEncrypted
-Data\Resources\unity_builtin_extra, SignedAndEncrypted
