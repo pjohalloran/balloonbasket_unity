@@ -8,7 +8,6 @@ using BalloonBasket.Tech;
 namespace BalloonBasket.Game {
     public class Ship : MonoBehaviour {
 		public static readonly string PREFAB_NAME = "Ship";
-
 		private static readonly string ANCHOR_NAME = "ShipAnchor";
 		private static readonly string RANDOM_FORCE_METHODNAME = "RandomForce";
 
@@ -28,6 +27,8 @@ namespace BalloonBasket.Game {
 		public Vector2 BobbingRange = new Vector2(1500f, 3000f);
 
         void Start() {
+			this.rigidbody2D.sleepMode = RigidbodySleepMode2D.NeverSleep;
+
 			this._buttons = this.GetComponent<Buttons> ();
 			this.transform.localPosition = Vector3.zero;
 
@@ -38,7 +39,9 @@ namespace BalloonBasket.Game {
 
 			this._balloons = new List<Balloon>(this._maxBalloonCount);
 			for(int i = 0; i < this._startBalloonCount; ++i) {
-				this._balloons.Add(InstantiateBalloon(this._lineEndpoint.transform.localPosition + new Vector3(0.0f, 150f, 0.0f)));
+				Balloon balloon = InstantiateBalloon(this._lineEndpoint.transform.localPosition + new Vector3(0.0f, 150f, 0.0f));
+				balloon.GetComponent<SpriteRenderer>().sortingOrder = i;
+				this._balloons.Add(balloon);
 			}
 
 			this._sliderJoint.connectedBody = GameObject.Find(Ship.ANCHOR_NAME).GetComponent<Rigidbody2D>();
@@ -60,6 +63,17 @@ namespace BalloonBasket.Game {
 			balloon.onPumped += this.OnBalloonPumped;
             return balloon;
         }
+
+		private void OnCollisionEnter2D(Collision2D collision) {
+			if(collision.rigidbody != null && 
+			   (collision.rigidbody.gameObject.GetComponent<Mine>() != null ||
+			 	collision.rigidbody.gameObject.GetComponent<Gull>() != null)) {
+				if(collision.rigidbody.IsAwake() && this._balloons.Count > 0 && !this._balloonChangeInProgress) {
+					this._balloonChangeInProgress = true;
+					this._balloons[Random.Range(0, this._balloons.Count-1)].Pop();
+				}
+			}
+		}
 
 		private void RandomForce() {
 			Vector2 force = GenerateRandomForce(Random.Range(1f,10f) > 5f);
@@ -114,24 +128,43 @@ namespace BalloonBasket.Game {
 			UpdateSliderPosition(oldCount);
         }
 
+		private float halfTargetHeight = 768f * 0.5f;
+		private float laneHeight = 768f / 5f;
+
+		public float a = -384;
+		public float b = -164;
+		public float c = -25;
+		public float d = 126;
+		public float e = 280;
+		public float f = 384;
+
+		private void OnGUI() {
+			GUI.Label(new Rect(5f, 5f, 200f, 50f), string.Format("a = " + a));
+			GUI.Label(new Rect(5f, 55f, 200f, 50f), string.Format("b = " + b));
+			GUI.Label(new Rect(5f, 105f, 200f, 50f), string.Format("c = " + c));
+			GUI.Label(new Rect(5f, 155f, 200f, 50f), string.Format("d = " + d));
+			GUI.Label(new Rect(5f, 205f, 200f, 50f), string.Format("e = " + e));
+			GUI.Label(new Rect(5f, 255f, 200f, 50f), string.Format("f = " + f));
+		}
+
 		private void UpdateSliderPosition(int oldCount) {
 			int count = this._balloons.Count;
 			JointTranslationLimits2D limits = new JointTranslationLimits2D();
-			if(count > 12) {
-				limits.min = 200f;
-				limits.max = 300f;
-			} else if(count > 9) {
-				limits.min = 100f;
-				limits.max = 200f;
-			} else if(count > 6) {
-				limits.min = 0f;
-				limits.max = 100f;
-			} else if(count > 3) {
-				limits.min = -200f;
-				limits.max = -100f;
+			if(count >= 12) {
+				limits.max = f;
+				limits.min = e;
+			} else if(count >= 9) {
+				limits.max = e;
+				limits.min = d;
+			} else if(count >= 6) {
+				limits.max = d;
+				limits.min = c;
+			} else if(count >= 3) {
+				limits.max = c;
+				limits.min = b;
 			} else {
-				limits.min = -300f;
-				limits.max = -200f;
+				limits.max = b;
+				limits.min = a;
 			}
 			this._sliderJoint.limits = limits;
 
@@ -140,14 +173,14 @@ namespace BalloonBasket.Game {
 				//CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
 				//Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
 				//Vector2 randomForce = GenerateRandomForce(true);
-				Vector2 randomForce = new Vector2(0f, 10000f);
+				Vector2 randomForce = new Vector2(0f, 1000f);
 				this.rigidbody2D.AddForce(randomForce);
 			} else if(this.transform.localPosition.y > limits.max) {
 				Debug.Log ("Ship too high");
 				//CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
 				//Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
 				//Vector2 randomForce = GenerateRandomForce(false);
-				Vector2 randomForce = new Vector2(0f, -10000f);
+				Vector2 randomForce = new Vector2(0f, -1000f);
 				this.rigidbody2D.AddForce(randomForce);
 			}
 		}
