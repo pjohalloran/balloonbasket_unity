@@ -45,9 +45,12 @@ namespace BalloonBasket.Game {
 			}
 
 			this._sliderJoint.connectedBody = GameObject.Find(Ship.ANCHOR_NAME).GetComponent<Rigidbody2D>();
+			SetLimitsFromBalloonCount(this._startBalloonCount);
+			this._lastCount = this._startBalloonCount;
+
 			this.BobbingRange = new Vector2(500f, 750f);
 
-			Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(1f, 10f));
+			//Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(1f, 10f));
         }
 
         private Balloon InstantiateBalloon(Vector3 position) {
@@ -78,7 +81,6 @@ namespace BalloonBasket.Game {
 		private void RandomForce() {
 			Vector2 force = GenerateRandomForce(Random.Range(1f,10f) > 5f);
 			this.rigidbody2D.AddForce(force);
-			Debug.Log (string.Format("Force {0} at {1}", force.ToString(), Time.time));
 			Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(1f, 10f));
 		}
 
@@ -92,7 +94,8 @@ namespace BalloonBasket.Game {
 			this._balloonChangeInProgress = false;
 		}
 
-        void Update() {
+		private int _lastCount = 0;
+        void FixedUpdate() {
 			this._buttons.PollState ();
 
             Vector3 shipOffset = Vector2.zero;
@@ -111,7 +114,6 @@ namespace BalloonBasket.Game {
             
             this.rigidbody2D.AddForce(shipOffset);
 
-			int oldCount = this._balloons.Count;
 			if(Input.GetKeyDown(KeyCode.O) || this._buttons.CrossPressed) {
 				if(!this._balloonChangeInProgress && this._balloons.Count < this._maxBalloonCount) {
 					this._balloonChangeInProgress = true;
@@ -125,19 +127,21 @@ namespace BalloonBasket.Game {
                 }
             }
 
-			UpdateSliderPosition(oldCount);
+			UpdateSliderPosition(this._balloons.Count, this._lastCount);
+			this._lastCount = this._balloons.Count;
         }
 
 		private float halfTargetHeight = 768f * 0.5f;
 		private float laneHeight = 768f / 5f;
 
 		public float a = -384;
-		public float b = -164;
-		public float c = -25;
-		public float d = 126;
-		public float e = 280;
+		public float b = -150;
+		public float c = 0;
+		public float d = 150;
+		public float e = 300;
 		public float f = 384;
 
+		/*
 		private void OnGUI() {
 			GUI.Label(new Rect(5f, 5f, 200f, 50f), string.Format("a = " + a));
 			GUI.Label(new Rect(5f, 55f, 200f, 50f), string.Format("b = " + b));
@@ -145,46 +149,57 @@ namespace BalloonBasket.Game {
 			GUI.Label(new Rect(5f, 155f, 200f, 50f), string.Format("d = " + d));
 			GUI.Label(new Rect(5f, 205f, 200f, 50f), string.Format("e = " + e));
 			GUI.Label(new Rect(5f, 255f, 200f, 50f), string.Format("f = " + f));
-		}
 
-		private void UpdateSliderPosition(int oldCount) {
-			int count = this._balloons.Count;
-			JointTranslationLimits2D limits = new JointTranslationLimits2D();
+			if(GUI.Button(new Rect(5f, 300f, 100f, 100f), "UP")) {
+				this.rigidbody2D.AddForce(Vector2.up * 5000f);
+			}
+			if(GUI.Button(new Rect(5f, 400f, 100f, 100f), "DOWN")) {
+				this.rigidbody2D.AddForce(-Vector2.up * 5000f);
+			}
+		}*/
+
+		private void SetLimitsFromBalloonCount(int count) {
+			JointTranslationLimits2D limits = this._sliderJoint.limits;
+			this._sliderJoint.useLimits = true;
+
 			if(count >= 12) {
+				Debug.LogError ("Entering 5");
 				limits.max = f;
 				limits.min = e;
 			} else if(count >= 9) {
+				Debug.LogError ("Entering 4");
 				limits.max = e;
 				limits.min = d;
 			} else if(count >= 6) {
+				Debug.LogError ("Entering 3");
 				limits.max = d;
 				limits.min = c;
 			} else if(count >= 3) {
+				Debug.LogError ("Entering 2");
 				limits.max = c;
 				limits.min = b;
 			} else {
+				Debug.LogError ("Entering 1");
 				limits.max = b;
 				limits.min = a;
 			}
-			this._sliderJoint.limits = limits;
 
-			if(this.transform.localPosition.y < limits.min) {
-				Debug.Log ("Ship too low");
-				//CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
-				//Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
-				//Vector2 randomForce = GenerateRandomForce(true);
-				Vector2 randomForce = new Vector2(0f, 1000f);
-				this.rigidbody2D.AddForce(randomForce);
-			} else if(this.transform.localPosition.y > limits.max) {
-				Debug.Log ("Ship too high");
-				//CancelInvoke(Ship.RANDOM_FORCE_METHODNAME);
-				//Invoke(Ship.RANDOM_FORCE_METHODNAME, Random.Range(2f, 10f));
-				//Vector2 randomForce = GenerateRandomForce(false);
-				Vector2 randomForce = new Vector2(0f, -1000f);
-				this.rigidbody2D.AddForce(randomForce);
-			}
+			this._sliderJoint.limits = limits;
 		}
 
+		private Vector2 _correctForce = new Vector2(0f, 10000f);
+		private void UpdateSliderPosition(int oldCount, int newCount) {
+			if(newCount != oldCount) {
+				SetLimitsFromBalloonCount(newCount);
+			}
+
+			if(this.transform.localPosition.y < this._sliderJoint.limits.min) {
+				this.rigidbody2D.AddForce(Vector2.up * 5000f);
+			} else if(this.transform.localPosition.y > this._sliderJoint.limits.max) {
+				this.rigidbody2D.AddForce(-Vector2.up * 5000f);
+			}
+		}
+		
 		private Vector2 GenerateRandomForce(bool upwards) {
 			float random = Random.Range(this.BobbingRange.x, this.BobbingRange.y);
 			return new Vector2(0f, upwards ? random : -random);

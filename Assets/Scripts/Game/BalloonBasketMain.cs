@@ -24,6 +24,8 @@ using BalloonBasket.Game;
         [SerializeField] private AnimationCurve _spawnCurve;
         [SerializeField] private AnimationCurve _gustCurve;
 
+		[SerializeField] private TextMesh _speedText;
+
 		[SerializeField] public List<Vector3> _lanePositions = new List<Vector3>(5);
 		[SerializeField] private float _timeBetweenColumns = 5f; // TODO probably not right to have a fixed time..
 
@@ -95,7 +97,16 @@ using BalloonBasket.Game;
             }
 
 			this._speed.x = Mathf.Max(speedScroll, speedGust);
-
+			int speed = Mathf.FloorToInt(this._speed.x);
+			this._speedText.text = string.Format("{0} km/h", Mathf.Floor(this._speed.x));
+			if(speed > 356) {
+				this._speedText.color = Color.red;
+			} else if(speed > 275) {
+				this._speedText.color = Color.green;
+			} else {
+				this._speedText.color = Color.white;
+			}
+			
 			UpdateBgScroll();
 			CheckObstacles();
 			UpdateScenery(this._nearLayer, this._nearSpeed);
@@ -119,6 +130,8 @@ using BalloonBasket.Game;
 					} else if(c == LevelReader.O_FINISH && !flagMade) {
 						MakeFlag(0);
 						flagMade = true;
+					} else if(c == LevelReader.O_WIND150 || c == LevelReader.O_WIND200) {
+						MakeGust(rowIndex/*, c*/);//TODO type of gust
 					}
 				}
 				++this._colIndex;
@@ -190,6 +203,7 @@ using BalloonBasket.Game;
 
 		private void MakeGust(int lane = -1) {
 			GameObject obj = MakeObstacle(Gust.PREFAB_NAME, lane);
+			
 		}
 
         private void MakeRandomObstacle() {
@@ -295,7 +309,7 @@ using BalloonBasket.Game;
         }
 
 		private void OnShipHitFlag() {
-			
+			// TODO End of Level
 		}
     }
 //}
