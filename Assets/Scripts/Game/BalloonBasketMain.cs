@@ -9,6 +9,7 @@ using BalloonBasket.Game;
 //namespace BalloonBasket.Game {
     public class BalloonBasketMain : MonoBehaviour {
 		[SerializeField] private ScoreBoard _timer;
+		//[SerializeField] private MenuButton _pauseButton; // TODO
         [SerializeField] private Transform _staticRoot;
         [SerializeField] private Transform _nearLayer;
         [SerializeField] private float _nearSpeed = 0.5f;
@@ -43,7 +44,7 @@ using BalloonBasket.Game;
 		public void StartLevel(List<List<char>> levelData) {
 			this._levelData = levelData;
 			this._random = false;
-
+			Invoke("MakeRandomBg", this._spawnCurve.Evaluate(Time.time));
 		}
 
 		public void StartRandom() {
@@ -80,12 +81,12 @@ using BalloonBasket.Game;
     	private void Update () {
 			this._buttons.PollState ();
 
-			if (this._buttons.StartPressed) {
+			if (this._buttons.StartPressed || Input.GetKeyUp(KeyCode.Escape)) {
 				// reload level
-				Application.LoadLevel("game");
+				LoadMainMenu();
 			}
 
-			this._timer.SetScore(Time.time);
+			this._timer.SetScore(Time.timeSinceLevelLoad);
 
             float scrollTimeDiff = Time.time - this._lastExplosionTime;
             float speedScroll = this._scrollCurve.Evaluate(scrollTimeDiff) * 500f;
@@ -240,15 +241,19 @@ using BalloonBasket.Game;
                 t = this._farLayer;
             }
 
+			int typeRes = Random.Range(0, 4);
+			Texture2D tex = null;
 			float graceX = 200f;
+
+			if(typeRes == 3) {
+				// Fix trees in near layer
+				t = this._nearLayer;
+			}
 
 			maxLayerX = (1f / t.localScale.x) * halfScreenWidth + graceX;
 			maxLayerY = (1f / t.localScale.y) * halfScreenHeight;
 			position.x = maxLayerX;
-			position.y = Random.Range(-maxLayerY, maxLayerY);
-
-            int typeRes = Random.Range(0, 4);
-            Texture2D tex = null;
+			position.y = typeRes != 3 ? Random.Range(-maxLayerY, maxLayerY) : -maxLayerY; // fix at bottom for trees
 
             if(typeRes == 1) {
                 tex = Utils.LoadResource("Cloud"+Random.Range(1, 5)) as Texture2D;
@@ -256,10 +261,10 @@ using BalloonBasket.Game;
             } else if(typeRes == 2) {
                 tex = Utils.LoadResource("Ground"+Random.Range(1, 6)) as Texture2D;
 				position.y = -maxLayerY;
-			} else if(typeRes == 3) { // TODO: Move out for level data
+			} else if(this._random && typeRes == 3) { // TODO: Move out for level data
                 tex = Utils.LoadResource("Tree"+Random.Range(1, 2)) as Texture2D;
 				position.y = -maxLayerY;
-            } else { // TODO: Move out for level data
+			} else if(this._random) { // TODO: Move out for level data
                 InstantiateBg(position, "Gust", this._nearLayer);
             }
 
@@ -309,7 +314,13 @@ using BalloonBasket.Game;
         }
 
 		private void OnShipHitFlag() {
-			// TODO End of Level
+			PlayerPrefs.SetFloat(Menu.SCORE_KEY, Time.timeSinceLevelLoad);
+			PlayerPrefs.Save();
+			Invoke("LoadMainMenu", 2f);
+		}
+
+		private void LoadMainMenu() {
+			Application.LoadLevel("game");
 		}
     }
 //}
