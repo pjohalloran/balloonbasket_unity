@@ -1,0 +1,3 @@
+[submodule "Assets/Plugins/hotween"]
+	path = Assets/Plugins/hotween
+	url = git://github.com/pjohalloran/hotween.git
