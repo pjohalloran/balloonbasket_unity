@@ -42,6 +42,9 @@ public class Menu : MonoBehaviour {
 	}
 
 	void Awake() {
+		Holoville.HOTween.HOTween.Init(false, false, true);
+		Holoville.HOTween.HOTween.EnableOverwriteManager();
+
 		if (!PlayerPrefs.HasKey (Menu.SCORE_KEY) || Mathf.Approximately(this.BestTime, 0f)) {
 			//this._highScore.gameObject.SetActive(false);
 			//this.BestTime = 0f;
@@ -71,10 +74,18 @@ public class Menu : MonoBehaviour {
 		}
 	}
 
+	private GameObject _clickedGo = null;
 	private void OnButtonClick(GameObject go) {
+		this._clickedGo = go;
+		Holoville.HOTween.Tweener tweener = Holoville.HOTween.HOTween.To(this._highScore.gameObject.transform, 0.5f,
+		                                                                 new Holoville.HOTween.TweenParms().Prop("localPosition", new Vector3(323f, 326f, 0f)).OnComplete(this.StartGame));
+		//tweener.onComplete += StartGame;
+	}
+
+	private void StartGame() {
 		this.gameObject.SetActive (false);
 		this._gameHolder.SetActive (true);
-		int index = this._menuButtons.IndexOf(go.GetComponent<MenuButton>());
+		int index = this._menuButtons.IndexOf(this._clickedGo.GetComponent<MenuButton>());
 		if(index != 3) {
 			this._gameHolder.GetComponent<BalloonBasketMain>().StartLevel(LevelReader.ParseLevel(string.Format("level{0}", index+1)));
 		} else {
