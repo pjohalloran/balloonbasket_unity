@@ -9,6 +9,15 @@ public class MenuButton : MonoBehaviour {
 
 	public OnButtonClick onButtonClick;
 
+	public float Alpha {
+		get {
+			return this._sprite.color.a;
+		} set {
+			Color spriteColor = this._sprite.color;
+			this._sprite.color = new Color(spriteColor.r, spriteColor.g, spriteColor.b, value);
+		}
+	}
+
 	public Sprite UpState {
 		get;
 		set;

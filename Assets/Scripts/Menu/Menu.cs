@@ -33,6 +33,7 @@ public class Menu : MonoBehaviour {
 		}
 	}
 
+	/*
 	void OnGUI() {
 		if (GUI.Button (new Rect (5f, 5f, 100f, 100f), "FADE IN")) {
 			this._highScore.FadeIn(1f);
@@ -41,6 +42,7 @@ public class Menu : MonoBehaviour {
 			this._highScore.FadeOut(1f);
 		}
 	}
+	*/
 
 	void Awake() {
 		Holoville.HOTween.HOTween.Init(false, false, true);
@@ -64,7 +66,6 @@ public class Menu : MonoBehaviour {
 		                                         new Rect(0f, 0f, this._highlightedImage.width, this._highlightedImage.height),
 		                                  new Vector2(0.5f, 0.5f), 1f);
 		
-		
 		foreach (MenuButton button in this._menuButtons) {
 			button.DownState = downButton;
 			button.UpState = upButton;
@@ -72,6 +73,27 @@ public class Menu : MonoBehaviour {
 			button.HoverState = hoverButton;
 			button.onButtonClick -= this.OnButtonClick;
 			button.onButtonClick += this.OnButtonClick;
+
+			float toWidth = this._hoverImage.width + this._hoverImage.width *0.2f;
+			float toHeight = this._hoverImage.width + this._hoverImage.width *0.2f;
+			Tweener left = HOTween.To(button.gameObject.transform, 0.5f,
+			                          new TweenParms().Prop("localRotation", Quaternion.AngleAxis(2f, new Vector3(0f, 0f, 1f))).Ease(EaseType.EaseInOutQuad));
+			Tweener right = HOTween.To(button.gameObject.transform, 0.5f,
+			                           new TweenParms().Prop("localRotation", Quaternion.AngleAxis(-2f, new Vector3(0f, 0f, 1f))).Ease(EaseType.EaseInOutQuad));
+			Tweener center = HOTween.To(button.gameObject.transform, 0.5f,
+			                            new TweenParms().Prop("localRotation", Quaternion.AngleAxis(0f, new Vector3(0f, 0f, 1f))).Ease(EaseType.EaseInOutQuad));
+			Tweener sup = HOTween.To(button.gameObject.transform, 0.25f,
+			                         new TweenParms().Prop("localScale", new Vector3(0.525f, 0.525f, 1f)).Ease(EaseType.EaseInOutQuad));
+			Tweener sdn = HOTween.To(button.gameObject.transform, 0.25f,
+			                         new TweenParms().Prop("localScale", new Vector3(0.5f, 0.5f, 1f)).Ease(EaseType.EaseInOutQuad));
+
+			Sequence seq = new Sequence(new SequenceParms().Loops(100, LoopType.Restart));
+			seq.Append(left);
+			seq.Append(right);
+			seq.Append(center);
+			seq.Append(sup);
+			seq.Append(sdn);
+			seq.Play();
 		}
 	}
 
@@ -79,7 +101,11 @@ public class Menu : MonoBehaviour {
 	private void OnButtonClick(GameObject go) {
 		this._clickedGo = go;
 		Tweener tweener = HOTween.To(this._highScore.gameObject.transform, 0.5f,
-		                                                                 new TweenParms().Prop("localPosition", new Vector3(323f, 326f, 0f)).OnComplete(this.StartGame));
+		                             new TweenParms().Prop("localPosition", new Vector3(323f, 326f, 0f)).Ease(EaseType.EaseInExpo).OnComplete(this.StartGame));
+		foreach (MenuButton button in this._menuButtons) {
+			HOTween.To(button, 0.5f,
+			           new TweenParms().Prop("Alpha", 0f).Ease(EaseType.EaseInExpo));
+		}
 	}
 
 	private void StartGame() {

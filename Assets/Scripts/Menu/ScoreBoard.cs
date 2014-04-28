@@ -3,6 +3,8 @@ using System.Collections;
 
 using UnityEngine;
 
+using Holoville.HOTween;
+
 using BalloonBasket.Tech;
 
 public class ScoreBoard : MonoBehaviour {
@@ -33,26 +35,12 @@ public class ScoreBoard : MonoBehaviour {
 	}
 
 	public void FadeIn(float duration) {
-		StartCoroutine (FadeCoroutine(duration, 1f));
+		HOTween.To(this, 0.5f,
+		           new TweenParms().Prop("Alpha", 1f).Ease(EaseType.EaseInOutExpo));
 	}
 
 	public void FadeOut(float duration) {
-		StartCoroutine (FadeCoroutine(duration, 0f));
-	}
-
-	// TODO Fix
-	private IEnumerator FadeCoroutine(float duration, float to) {
-		float progress = 0f;
-		float step = duration * 0.01f;
-		float from = this.Alpha;
-		float alphaStep = 0.01f * duration;
-		float alphaProgress = 0f;
-		while (progress < duration/*!Mathf.Approximately(this.Alpha, to)*/) {
-			this.Alpha = Mathf.Lerp(from, to, alphaProgress);
-			progress += step;
-			alphaProgress += alphaStep;
-			Debug.Log ("progress = " + progress);
-			yield return new WaitForEndOfFrame();
-		}
+		HOTween.To(this, 0.5f,
+		           new TweenParms().Prop("Alpha", 0f).Ease(EaseType.EaseInOutExpo));
 	}
 }
