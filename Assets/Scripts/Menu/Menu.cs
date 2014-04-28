@@ -4,9 +4,10 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+using Holoville.HOTween;
+
 using BalloonBasket.Tech;
 using BalloonBasket.Game;
-
 
 public class Menu : MonoBehaviour {
 	public static readonly string SCORE_KEY = "BEST_SCORE";
@@ -77,9 +78,8 @@ public class Menu : MonoBehaviour {
 	private GameObject _clickedGo = null;
 	private void OnButtonClick(GameObject go) {
 		this._clickedGo = go;
-		Holoville.HOTween.Tweener tweener = Holoville.HOTween.HOTween.To(this._highScore.gameObject.transform, 0.5f,
-		                                                                 new Holoville.HOTween.TweenParms().Prop("localPosition", new Vector3(323f, 326f, 0f)).OnComplete(this.StartGame));
-		//tweener.onComplete += StartGame;
+		Tweener tweener = HOTween.To(this._highScore.gameObject.transform, 0.5f,
+		                                                                 new TweenParms().Prop("localPosition", new Vector3(323f, 326f, 0f)).OnComplete(this.StartGame));
 	}
 
 	private void StartGame() {
