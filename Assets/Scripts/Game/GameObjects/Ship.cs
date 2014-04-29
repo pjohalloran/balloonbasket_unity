@@ -167,7 +167,7 @@ namespace BalloonBasket.Game {
 
 			UpdateSliderPosition(this._balloons.Count, this._lastCount);
 			this._lastCount = this._balloons.Count;
-			Debug.LogError(string.Format("LC ={0}, C={1}", this._lastCount, this._balloons.Count));
+			//Debug.LogError(string.Format("LC ={0}, C={1}", this._lastCount, this._balloons.Count));
         }
 
 		private float halfTargetHeight = 768f * 0.5f;
@@ -223,27 +223,27 @@ namespace BalloonBasket.Game {
 			this._sliderJoint.useLimits = true;
 
 			if(count >= 12) {
-				Debug.LogError ("Lane 5");
+				//Debug.LogError ("Lane 5");
 				limits.max = f;
 				limits.min = e;
 			} else if(count >= 9 && count < 12) {
-				Debug.LogError ("Lane 4");
+				//Debug.LogError ("Lane 4");
 				limits.max = e;
 				limits.min = d;
 			} else if(count >= 6 && count < 9) {
-				Debug.LogError ("Lane 3");
+				//Debug.LogError ("Lane 3");
 				limits.max = d;
 				limits.min = c;
 			} else if(count >= 3 && count < 6) {
-				Debug.LogError ("Lane 2");
+				//Debug.LogError ("Lane 2");
 				limits.max = c;
 				limits.min = b;
 			} else if(count < 3) {
-				Debug.LogError ("Lane 1");
+				//Debug.LogError ("Lane 1");
 				limits.max = b;
 				limits.min = a;
 			} else {
-				Debug.LogError("COUNT = " + count);
+				//Debug.LogError("COUNT = " + count);
 			}
 
 			this._sliderJoint.limits = limits;
@@ -256,10 +256,10 @@ namespace BalloonBasket.Game {
 			}
 
 			if(this.transform.localPosition.y < this._sliderJoint.limits.min) {
-				Debug.LogError("UPWARD");
+				//Debug.LogError("UPWARD");
 				this.rigidbody2D.AddForce(Vector2.up * 5000f);
 			} else if(this.transform.localPosition.y > this._sliderJoint.limits.max) {
-				Debug.LogError("DOWNWARD");
+				//Debug.LogError("DOWNWARD");
 				this.rigidbody2D.AddForce(-Vector2.up * 5000f);
 			}
 		}

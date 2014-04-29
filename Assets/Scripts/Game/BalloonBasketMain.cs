@@ -85,6 +85,9 @@ using BalloonBasket.Game;
 				// reload level
 				LoadMainMenu();
 			}
+			if(Application.isWebPlayer && Input.GetKeyUp(KeyCode.F)) {
+				Screen.fullScreen = !Screen.fullScreen;
+			}
 
 			this._timer.SetScore(Time.timeSinceLevelLoad);
 
