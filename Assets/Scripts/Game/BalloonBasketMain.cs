@@ -280,7 +280,7 @@ using BalloonBasket.Game;
             }
 
             float nextTime = this._spawnCurve.Evaluate(Time.time);
-            //Debug.Log ("Spawning again in "+nextTime);
+            Debug.Log ("Spawning again in "+nextTime);
             Invoke("MakeRandomBg", nextTime);
         }
 

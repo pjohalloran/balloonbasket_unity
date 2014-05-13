@@ -21,6 +21,7 @@ namespace BalloonBasket.Game {
         [SerializeField] private AudioClip _popClip;
         [SerializeField] private LineRenderer _line;
 		[SerializeField] private GameObject _lineEndpoint;
+		[SerializeField] private int _lineSegementCount = 20;
 
         public OnPopped onPopped;
 		public OnPumped onPumped;
@@ -40,6 +41,7 @@ namespace BalloonBasket.Game {
 
 		#region PoolObject interface
 		public void Init() {
+			this._line.SetVertexCount(this._lineSegementCount);
 			Inflate();
 			this._sprite.color = this._color[Random.Range(0, this._color.Length-1)];
 		}
@@ -49,8 +51,12 @@ namespace BalloonBasket.Game {
 		#endregion
 
         void Update() {
-			this._line.SetPosition(0, this._lineEndpoint.transform.position);
-            this._line.SetPosition(1, this.Ship.GetLineEndpoint().position);
+			float d = Vector3.Distance(this._lineEndpoint.transform.position, this.Ship.GetLineEndpoint().position);
+			Vector3 diff = this.Ship.GetLineEndpoint().position - this._lineEndpoint.transform.position;
+			diff.Normalize();
+			for(int i = 0; i < this._lineSegementCount; ++i) {
+				this._line.SetPosition(i, this._lineEndpoint.transform.position + diff*(d*((float)i/this._lineSegementCount)));
+			}
         }
 
         private void Inflate() {
